@@ -1,0 +1,26 @@
+# Review item schema for docs/reviews/pending/<lane>.yaml
+reviewer_lane: security
+base_commit: abc123
+items:
+  - id: SEC-001
+    severity: P1 # P0, P1, P2, P3
+    status: open
+    claim: "Describe the concrete problem."
+    evidence:
+      files:
+        - "src/example.ts:10-30"
+      observed: "What was observed."
+      expected: "What should happen."
+    affected_files:
+      - "src/example.ts"
+    user_impact: "Why this matters."
+    suggested_direction: "High-level repair direction, not necessarily exact code."
+    acceptance_criteria:
+      - "Concrete criterion that proves the issue is fixed."
+    validation_commands:
+      - "npm test"
+    requires_human_decision: false
+    allowed_scope:
+      - "src/example.ts"
+    forbidden_scope:
+      - "src/billing.ts"

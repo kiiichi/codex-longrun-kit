@@ -1,0 +1,48 @@
+# CONTINUITY.md — Compaction-safe ledger
+
+Created: {{CREATED_AT}}
+Repository: {{REPO_NAME}}
+
+This file is the canonical compact state for long-running Codex work. Another Codex thread should be able to resume by reading this file plus the other files in `docs/agent/`.
+
+## Goal
+
+{{TASK_BRIEF_COMPACT}}
+
+## Current state
+
+- Status: initialized
+- Active milestone: M0
+- Last completed milestone: none
+- Last validation: not run yet
+- Review freeze: not started
+
+## Key constraints
+
+- Follow `Prompt.md` and `Plan.md`.
+- Work one milestone at a time.
+- Keep diffs scoped.
+- Run validation and record results.
+- Stop under `STOP_RULES.md`.
+
+## Key decisions
+
+- Long-run scaffold initialized at {{CREATED_AT}}.
+
+## Open questions
+
+- None recorded yet.
+
+## Working set
+
+Files expected to change during this long-run task:
+
+- To be determined by `Plan.md`.
+
+## Next action
+
+Review `Plan.md`. Do not start broad implementation until plan review is complete or explicitly waived.
+
+## Update rule
+
+Update this ledger after every milestone or material decision. Keep it compact. Do not turn it into a full log; use `Documentation.md` for detailed history.

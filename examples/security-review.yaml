@@ -1,0 +1,22 @@
+reviewer_lane: security
+base_commit: example
+items:
+  - id: SEC-001
+    severity: P1
+    status: open
+    claim: "Example endpoint appears to bypass auth middleware."
+    evidence:
+      files:
+        - "src/api/projects.ts:42-71"
+      observed: "Route is registered before auth guard."
+      expected: "All project routes require auth."
+    affected_files:
+      - "src/api/projects.ts"
+    user_impact: "Unauthenticated project access."
+    suggested_direction: "Move route registration behind auth middleware."
+    acceptance_criteria:
+      - "Unauthenticated project request returns 401."
+      - "Authenticated project request still succeeds."
+    validation_commands:
+      - "npm run test:auth"
+    requires_human_decision: false

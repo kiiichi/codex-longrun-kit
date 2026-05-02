@@ -1,0 +1,13 @@
+# HumanDecisionsNeeded.md
+
+Generated: {{CREATED_AT}}
+
+No human decisions have been recorded yet.
+
+When review normalization finds ambiguity or conflicts, list them here with:
+
+- source review ids
+- affected files
+- decision required
+- options
+- recommended next step
