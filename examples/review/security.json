@@ -1,0 +1,22 @@
+{
+  "reviewer_lane": "security",
+  "base_commit": "abc123",
+  "findings": [
+    {
+      "id": "SEC-001",
+      "severity": "P1",
+      "claim": "Settings save endpoint appears to lack an authorization regression test.",
+      "evidence": {
+        "files": ["src/api/settings.ts", "tests/settings.test.ts"],
+        "observed": "No test covers unauthenticated save attempts."
+      },
+      "affected_files": ["tests/settings.test.ts"],
+      "acceptance_criteria": [
+        "Unauthenticated settings save returns 401.",
+        "Authenticated settings save still succeeds."
+      ],
+      "validation_commands": ["npm test -- settings"],
+      "requires_human_decision": false
+    }
+  ]
+}

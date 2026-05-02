@@ -3,10 +3,6 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
-.venv/
-venv/
-dist/
-build/
-*.egg-info/
-.codex_artifacts/
 .DS_Store
+.codex_artifacts/
+*.zip

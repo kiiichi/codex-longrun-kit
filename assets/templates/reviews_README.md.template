@@ -1,0 +1,16 @@
+# Independent review reports
+
+Write one JSON report per reviewer lane under `docs/reviews/pending/`.
+
+Reviewers should not read each other's reports before the review window closes.
+
+After all reports are present, run:
+
+```bash
+python scripts/normalize_reviews.py --target .
+```
+
+The normalizer writes:
+
+- `docs/reviews/ReviewQueue.json`
+- `docs/reviews/HumanDecisionsNeeded.md`

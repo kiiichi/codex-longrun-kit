@@ -1,22 +1,8 @@
 [project]
 name = "codex-longrun-kit"
-version = "0.1.0"
-description = "A Codex Skill kit for initializing reviewable long-running Codex tasks."
-readme = "README.md"
+version = "0.2.0"
+description = "Codex skill for compact, reviewable long-running Codex task initialization."
 requires-python = ">=3.10"
-license = { text = "MIT" }
-authors = [
-  { name = "codex-longrun-kit contributors" }
-]
-dependencies = []
-
-[project.optional-dependencies]
-yaml = ["PyYAML>=6"]
-test = ["pytest>=8", "PyYAML>=6"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = [".agents/skills/codex-longrun-init/scripts"]
 
 [tool.ruff]
 line-length = 100

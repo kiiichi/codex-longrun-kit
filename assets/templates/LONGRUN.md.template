@@ -1,0 +1,147 @@
+# LONGRUN.md
+
+Read when:
+- starting long-run work
+- choosing next milestone
+- deciding whether a stop rule applies
+- preparing review freeze
+
+Update when:
+- task contract changes
+- milestones change
+- validation gates change
+- stop rules change
+
+Do not:
+- store step-by-step logs here
+- record guesses as facts
+- exceed what a new Codex thread can read quickly
+
+## Task contract
+
+Goal:
+{{TASK_BRIEF}}
+
+Done when:
+- [ ] UNCONFIRMED: define final observable outcome.
+- [ ] All required validation gates pass or are explicitly waived by the user.
+- [ ] `STATE.md` reflects final status.
+
+Non-goals:
+- [ ] UNCONFIRMED: list work that should not be done in this run.
+
+Hard constraints:
+- Do not access secrets, production systems, deployment targets, or external services unless explicitly approved.
+- Do not expand scope beyond the milestones below without updating this file.
+- Do not start long-running servers in the foreground.
+
+## Shared terms
+
+- **AFK**: can be completed without further human input if validation passes.
+- **HITL**: human-in-the-loop; requires a user decision.
+- **Review freeze**: stop modifying code and prepare artifacts for review.
+- **Validation gate**: command or manual check that proves a milestone.
+- **State snapshot**: compact handoff in `STATE.md`.
+
+## Milestones
+
+### M1 — Scope and baseline
+
+Type: HITL until unknowns are resolved.
+
+Acceptance criteria:
+- [ ] Existing project shape is understood.
+- [ ] Required validation commands are confirmed.
+- [ ] Unknowns that block implementation are listed.
+
+Validation:
+{{FAST_VALIDATION}}
+
+### M2 — First vertical slice
+
+Type: AFK if M1 has no blockers.
+
+Acceptance criteria:
+- [ ] A narrow end-to-end slice is implemented.
+- [ ] Tests or checks cover observable behavior.
+- [ ] Diff is scoped to this slice.
+
+Validation:
+{{TARGETED_VALIDATION}}
+
+### M3 — Complete remaining slices
+
+Type: AFK if each slice is independent.
+
+Acceptance criteria:
+- [ ] Remaining agreed slices are implemented one at a time.
+- [ ] Each slice updates validation evidence.
+- [ ] No unrelated cleanup is mixed in.
+
+Validation:
+{{FULL_VALIDATION}}
+
+### M4 — Review freeze
+
+Type: HITL.
+
+Acceptance criteria:
+- [ ] Code modifications stop.
+- [ ] `docs/agent/REVIEW.md` is generated.
+- [ ] Independent review reports can be written under `docs/reviews/pending/`.
+
+Validation:
+{{FREEZE_VALIDATION}}
+
+## Execution rules
+
+- Work one milestone at a time.
+- Prefer vertical slices over horizontal layer-by-layer work.
+- Keep patches small enough to review.
+- Run the relevant validation gate before moving to the next milestone.
+- Update `STATE.md` after milestone completion, key decisions, validation failures, or stop rule triggers.
+- If a command requires a long-running server, run it in the background, capture logs, record the PID, and clean it up.
+
+## Stop rules
+
+Must stop and ask if:
+
+- Secrets, tokens, `.env`, production data, deployment, or external side effects are required.
+- Auth, payment, permissions, encryption, data retention, or destructive migration changes exceed the plan.
+- Validation fails twice after focused repair attempts.
+- The required fix expands beyond the current milestone.
+- Product behavior, architecture, or data model choice is genuinely ambiguous.
+- A destructive git or filesystem command is needed.
+- This file's stop rules need to change.
+
+Allowed without asking:
+
+- Local reads and searches.
+- Local edits inside the current repo that match the active milestone.
+- Local lint, typecheck, test, build, and non-destructive smoke checks.
+- Small test updates that verify observable behavior.
+
+Forbidden:
+
+- Committing secrets.
+- Production deployment.
+- `curl | sh` style installs.
+- Destructive git commands unless the user explicitly asks.
+- Writing outside the workspace.
+
+## Validation gates
+
+Fast gate:
+{{FAST_VALIDATION}}
+
+Targeted gate:
+{{TARGETED_VALIDATION}}
+
+Full gate:
+{{FULL_VALIDATION}}
+
+Freeze gate:
+{{FREEZE_VALIDATION}}
+
+Known flaky or expensive checks:
+- UNCONFIRMED: list checks that should not run every milestone.

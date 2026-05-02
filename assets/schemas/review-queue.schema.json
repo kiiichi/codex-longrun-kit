@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Codex Longrun Review Queue",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "tickets"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "base_commit": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "tickets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "ticket_id",
+          "title",
+          "source_review_ids",
+          "acceptance_criteria"
+        ],
+        "properties": {
+          "ticket_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          },
+          "source_review_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "affected_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "validation_commands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requires_human_decision": {
+            "type": "boolean"
+          },
+          "parallelizable": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

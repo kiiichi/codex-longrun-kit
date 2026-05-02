@@ -1,0 +1,85 @@
+# REVIEW.md
+
+Read when:
+- reviewing a frozen long-run result
+- writing independent review reports
+- normalizing feedback into fix tickets
+
+Update when:
+- review freeze is created
+- validation evidence changes before review starts
+
+Do not:
+- modify product code while updating this file
+- mix reviewer opinions into one shared report before independent reports are complete
+
+## Frozen version
+
+Base ref: {{BASE_REF}}
+Current ref: {{CURRENT_REF}}
+Commit: {{CURRENT_COMMIT}}
+Branch: {{CURRENT_BRANCH}}
+Created at: {{CREATED_AT}}
+
+## What changed
+
+{{DIFF_STAT}}
+
+## How to run
+
+Use the commands in `docs/agent/LONGRUN.md` validation gates.
+
+## Validation evidence
+
+- UNCONFIRMED: record commands run before review freeze.
+- UNCONFIRMED: record known failures and waived checks.
+
+## Review lanes
+
+Each reviewer works independently against the same frozen commit.
+
+- security
+- architecture
+- tests
+- UX / visual behavior
+- performance
+- maintainability
+
+## Review report format
+
+Write one JSON report per lane under:
+
+```text
+docs/reviews/pending/<lane>.json
+```
+
+Minimum shape:
+
+```json
+{
+  "reviewer_lane": "security",
+  "base_commit": "{{CURRENT_COMMIT}}",
+  "findings": [
+    {
+      "id": "SEC-001",
+      "severity": "P1",
+      "claim": "Describe the issue.",
+      "evidence": {"files": ["src/example.ts:1"], "observed": "..."},
+      "affected_files": ["src/example.ts"],
+      "acceptance_criteria": ["Expected behavior is verified."],
+      "validation_commands": ["npm test"],
+      "requires_human_decision": false
+    }
+  ]
+}
+```
+
+## Normalize feedback
+
+After all reports are complete:
+
+```bash
+python scripts/normalize_reviews.py --target .
+```
+
+Then fix tickets from `docs/reviews/ReviewQueue.json` one at a time.

@@ -1,0 +1,62 @@
+# STATE.md
+
+Read when:
+- starting or resuming a Codex session
+- after context compaction
+- before editing code
+- before changing milestone
+
+Update when:
+- milestone status changes
+- validation result changes
+- key decision changes
+- stop rule triggers
+
+Do not:
+- write step-by-step logs
+- record guesses as facts
+- exceed 80 lines unless review freeze requires it
+
+## Snapshot
+
+Current milestone: M1 — Scope and baseline
+Current status: initialized
+Next action: review `LONGRUN.md`, resolve `UNCONFIRMED` items, then decide whether to start implementation.
+
+## Done
+
+- Created compact long-run scaffold.
+
+## Decisions
+
+- Default runtime docs are compact: `LONGRUN.md` + `STATE.md`.
+
+## Validation
+
+Last commands:
+- Not run yet.
+
+Result:
+- UNCONFIRMED.
+
+Known failures:
+- None recorded.
+
+## Open questions
+
+- UNCONFIRMED: final done criteria.
+- UNCONFIRMED: validation commands that must pass before review freeze.
+
+## Working set
+
+Files changed:
+- `docs/agent/LONGRUN.md`
+- `docs/agent/STATE.md`
+
+Likely next files:
+- UNCONFIRMED.
+
+## Last reliable checkpoint
+
+Commit: UNCONFIRMED
+Review packet: not created

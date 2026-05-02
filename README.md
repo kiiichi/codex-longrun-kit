@@ -1,184 +1,114 @@
 # codex-longrun-kit
 
-`codex-longrun-kit` is a Codex Skill kit for initializing a repository so Codex can run long, reviewable coding tasks with less human handoff overhead.
+`codex-longrun-kit` is a Codex skill for initializing compact, reviewable, long-running Codex work.
 
-It does **not** try to make Codex magically autonomous. It creates the durable project scaffold that long-running Codex work needs:
+It does **not** make Codex fully autonomous or bypass approvals. It creates a small runtime scaffold so a multi-hour implementation, migration, refactor, or reviewable agent task can be planned, resumed, validated, frozen for review, and decomposed into follow-up tickets.
 
-- a task contract (`Prompt.md`)
-- a milestone plan (`Plan.md`)
-- an implementation runbook (`Implement.md`)
-- a continuity ledger (`CONTINUITY.md`)
-- stop rules and approval boundaries (`STOP_RULES.md`)
-- a validation matrix (`VALIDATION_MATRIX.md`)
-- a review freeze packet (`ReviewPacket.md`)
-- independent review files and a normalized review queue
+This v0.2 version uses **compact runtime docs** by default:
 
-The default behavior is conservative: the skill initializes and plans first, then stops before broad implementation unless the user explicitly asks to execute.
+- `docs/agent/LONGRUN.md` — task contract, milestones, stop rules, validation gates.
+- `docs/agent/STATE.md` — current handoff snapshot, kept short.
+- `docs/agent/REVIEW.md` — created lazily only when review is frozen.
 
-## Status
-
-`v0.1.0` initial scaffold.
-
-Implemented in this repository:
-
-- `codex-longrun-init` skill
-- templates for long-running task docs
-- scripts for initialization, stack detection, review freeze, and feedback normalization
-- project docs for future Codex threads
-- basic pytest coverage for the scripts
-
-Read [`docs/PROJECT_STATE.md`](docs/PROJECT_STATE.md) before continuing development.
+Strict mode can split out `STOP_RULES.md` and `VALIDATION_MATRIX.md`, but the default is intentionally small to reduce agent attention loss.
 
 ## Install
 
-### User-level install
+From a published GitHub repo:
 
-Copy or symlink the skill folder into your user skills directory:
-
-```bash
-mkdir -p ~/.agents/skills
-ln -s "$PWD/.agents/skills/codex-longrun-init" ~/.agents/skills/codex-longrun-init
+```powershell
+npx skills@latest add kiiichi/codex-longrun-kit -a codex -g
 ```
 
-Or copy it instead of symlinking:
+From a local checkout:
 
-```bash
-mkdir -p ~/.agents/skills/codex-longrun-init
-cp -R .agents/skills/codex-longrun-init/* ~/.agents/skills/codex-longrun-init/
+```powershell
+npx skills@latest add ./codex-longrun-kit -a codex -g
 ```
 
-### Repo-level install
+## Use
 
-For a target project, copy the skill into that repository:
-
-```bash
-mkdir -p /path/to/project/.agents/skills
-cp -R .agents/skills/codex-longrun-init /path/to/project/.agents/skills/
-```
-
-A user-level install is usually better for personal use. A repo-level install is better when the whole team should use the same workflow.
-
-## Use in Codex
-
-Invoke the skill explicitly:
+Invoke the skill in Codex:
 
 ```text
-$codex-longrun-init
+Use $codex-longrun-kit to initialize this repository for a long-running Codex task.
 
-Initialize this repository for a long-running Codex task.
 Task brief:
-<put PRD, migration brief, refactor goal, issue, or feature request here>
+<PRD / issue / migration goal / refactor goal>
 
-Do not implement yet. Generate the long-run scaffold and stop after Plan.md.
+Do not implement yet. Create the compact long-run docs, draft the plan, identify blockers, and stop at the plan review checkpoint.
 ```
 
-The skill should create or update:
+Chinese:
 
 ```text
-docs/agent/
-  Prompt.md
-  Plan.md
-  Implement.md
-  Documentation.md
-  CONTINUITY.md
-  STOP_RULES.md
-  VALIDATION_MATRIX.md
-  ReviewPacket.md
-docs/reviews/
-  pending/
-  status/
-.codex_artifacts/
+使用 $codex-longrun-kit 将当前仓库初始化为可长时间运行、可审查、可恢复的 Codex 长任务工作区。
+
+任务说明：
+<PRD / issue / migration goal / refactor goal>
+
+先不要实现。请创建紧凑长任务文档、草拟计划、识别阻塞项，并停在计划审核点。
 ```
 
-## Script usage outside Codex
+## Profiles
 
-The skill can also be used directly from a shell:
+| Profile | Generated during init | Use when |
+|---|---|---|
+| `minimal` | `LONGRUN.md`, `STATE.md` | Small repos, one reviewer, short long-run tasks. |
+| `standard` | `LONGRUN.md`, `STATE.md` | Default. Multi-hour tasks that need clear handoff and validation. |
+| `strict` | `LONGRUN.md`, `STATE.md`, `STOP_RULES.md`, `VALIDATION_MATRIX.md` | High-risk tasks, teams, or tasks with strict audit requirements. |
+
+Review docs are lazy. `REVIEW.md`, `docs/reviews/pending/`, and `docs/reviews/ReviewQueue.json` are created by the review/fix scripts when needed, not during normal initialization.
+
+## Direct script use
+
+Initialize a target repository:
 
 ```bash
-python .agents/skills/codex-longrun-init/scripts/init_longrun.py \
-  --repo-root . \
-  --task-brief-file examples/sample-task-brief.md
-```
-
-Detect candidate validation commands:
-
-```bash
-python .agents/skills/codex-longrun-init/scripts/detect_stack.py --repo-root . --format markdown
+python scripts/init_longrun.py --target /path/to/repo --profile standard --task-brief "Implement X"
 ```
 
 Freeze a review packet:
 
 ```bash
-python .agents/skills/codex-longrun-init/scripts/freeze_review.py --repo-root .
+python scripts/freeze_review.py --target /path/to/repo --base main
 ```
 
-Normalize independent review files into a review queue:
+Normalize independent review reports into atomic fix tickets:
 
 ```bash
-python .agents/skills/codex-longrun-init/scripts/normalize_reviews.py --repo-root .
+python scripts/normalize_reviews.py --target /path/to/repo
 ```
 
-## Recommended long-run flow
+PowerShell wrappers are available:
+
+```powershell
+./scripts/init-longrun.ps1 -Target C:\path\to\repo -Profile standard -TaskBrief "Implement X"
+./scripts/freeze-review.ps1 -Target C:\path\to\repo -Base main
+./scripts/normalize-reviews.ps1 -Target C:\path\to\repo
+```
+
+## Runtime principle
+
+Long-running Codex work needs external state, but each session should read the **minimum useful state**.
 
 ```text
-1. Human writes or pastes a task brief.
-2. $codex-longrun-init creates the scaffold.
-3. Human reviews Plan.md once.
-4. Codex executes one milestone at a time using Implement.md.
-5. Codex updates Documentation.md and CONTINUITY.md after each milestone.
-6. Codex freezes a ReviewPacket.md.
-7. Reviewers independently write docs/reviews/pending/*.yaml.
-8. normalize_reviews.py creates ReviewQueue.json and HumanDecisionsNeeded.md.
-9. Codex fixes one review ticket at a time, preferably one worktree per independent ticket.
-10. Human performs final validation from the evidence chain.
+Each run reads:       LONGRUN.md + STATE.md
+Review reads:         REVIEW.md + review reports
+Advanced topics read: references/*.md only when needed
+Project maintenance:  docs/*.md for this repo itself
 ```
 
-## Design stance
+## Files
 
-This kit favors reliability over maximum autonomy.
+- `SKILL.md`: the skill consumed by Codex.
+- `agents/openai.yaml`: UI metadata and default prompt.
+- `assets/templates/`: compact runtime templates.
+- `assets/schemas/`: JSON schemas for review reports and review queues.
+- `scripts/`: deterministic initialization, review freeze, and review normalization helpers.
+- `references/`: optional deep guidance; not meant to be read every run.
+- `docs/`: project state and development plan for this skill repository.
 
-Default choices:
+## Safety
 
-- Main Codex thread writes code.
-- Subagents are read-only by default.
-- Human review is batched around a frozen commit.
-- Feedback is normalized before repair.
-- Long-running foreground processes are avoided.
-- Risky actions are escalated instead of silently executed.
-
-## Repository map
-
-```text
-.agents/skills/codex-longrun-init/  # The actual Codex Skill
-  SKILL.md                          # Skill instructions and operating contract
-  assets/templates/                 # Files copied into target repos
-  references/                       # Long-form workflow guidance for Codex
-  scripts/                          # Deterministic helper scripts
-
-docs/                               # Project docs for this kit
-examples/                           # Example task brief and review file
-tests/                              # Pytest coverage for helper scripts
-```
-
-## Development
-
-```bash
-python -m pytest
-```
-
-The scripts are intentionally small and mostly standard-library based. `PyYAML` is optional but recommended for review normalization.
-
-## Non-goals
-
-This project does not:
-
-- bypass Codex sandbox or approval policies
-- guarantee unattended completion
-- replace CI/CD
-- deploy production changes
-- force parallel coding subagents
-- make product decisions without a human decision point
-
-## License
-
-MIT. See [`LICENSE`](LICENSE).
+This skill must not change sandbox settings, approval policy, secrets, production systems, or deployment state. It creates docs and review artifacts only. Any high-risk action belongs in the target repo's stop rules and must be approved by the user.

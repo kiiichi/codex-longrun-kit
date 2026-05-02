@@ -1,78 +1,57 @@
 # Project state
 
-Last updated: 2026-05-02
+Status: v0.2 scaffold generated.
 
-## Current phase
+## Current goal
 
-Initial v0.1 scaffold is ready.
+Build `codex-longrun-kit` as a deployable Codex skill that initializes target repositories for compact, reviewable long-running Codex tasks.
 
-The repository is designed as a Codex Skill kit. The primary skill is:
+## Current design
+
+The project intentionally separates:
+
+- **Skill entrypoint**: root `SKILL.md`, short and agent-facing.
+- **Deterministic helpers**: `scripts/*.py` and PowerShell wrappers.
+- **Runtime templates**: `assets/templates/`, used in target repos.
+- **Optional references**: `references/*.md`, read only when needed.
+- **Project docs**: `docs/*.md`, for maintaining this repo itself.
+
+## Important v0.2 change
+
+Default target output was reduced from many files to compact runtime docs:
 
 ```text
-.agents/skills/codex-longrun-init/
+docs/agent/LONGRUN.md
+docs/agent/STATE.md
 ```
 
-## What exists
+Review docs are created lazily by `freeze_review.py`.
 
-### Skill
+Strict mode can still generate:
 
-- `.agents/skills/codex-longrun-init/SKILL.md`
-- templates in `.agents/skills/codex-longrun-init/assets/templates/`
-- references in `.agents/skills/codex-longrun-init/references/`
-- helper scripts in `.agents/skills/codex-longrun-init/scripts/`
+```text
+docs/agent/STOP_RULES.md
+docs/agent/VALIDATION_MATRIX.md
+```
 
-### Helper scripts
+## Validation run
 
-- `detect_stack.py`: detects candidate validation commands from common project files.
-- `init_longrun.py`: creates long-run docs in a target repository.
-- `freeze_review.py`: generates a frozen review packet from git state.
-- `normalize_reviews.py`: turns independent review files into `ReviewQueue.json`.
+Run before release:
 
-### Project docs
+```bash
+python -m unittest discover -s tests
+```
 
-- `README.md`: installation and use.
-- `PROJECT.md`: mission, goals, technical route.
-- `AGENTS.md`: instructions for future Codex threads.
-- `docs/ARCHITECTURE.md`: system design.
-- `docs/TECHNICAL_ROUTE.md`: phased development route.
-- `docs/USAGE.md`: detailed usage.
-- `docs/REVIEW_WORKFLOW.md`: review and feedback normalization flow.
+## Next useful tasks
 
-### Tests
-
-- `tests/test_detect_stack.py`
-- `tests/test_init_longrun.py`
-- `tests/test_normalize_reviews.py`
-
-## Important design decisions
-
-1. The skill is explicit-invocation only by convention. It should not be used implicitly for small edits.
-2. Initialization stops before broad implementation unless the user explicitly requests execution.
-3. Subagents are read-only by default.
-4. Review feedback must be normalized before Codex repairs it.
-5. Scripts perform deterministic file operations; Markdown files hold workflow intent.
-6. Generated long-run state belongs in the target repository, not only in chat context.
+- Add richer conflict detection in `normalize_reviews.py`.
+- Add optional GitHub issue export for ReviewQueue tickets.
+- Add real-world smoke test against a small JS/Python repo.
+- Tune templates after first Codex dry run.
 
 ## Known limitations
 
-- `normalize_reviews.py` has simple duplicate and potential-conflict detection. It is intentionally conservative.
-- `detect_stack.py` returns candidate commands; a human or Codex should verify them before relying on them for unattended runs.
-- The project is not packaged as a plugin yet.
-- Worktree-based patch execution is documented but not automated.
-- The skill does not change Codex sandbox or approval policy.
-
-## Validation to run after changes
-
-```bash
-python -m pytest
-python .agents/skills/codex-longrun-init/scripts/detect_stack.py --repo-root . --format markdown
-python .agents/skills/codex-longrun-init/scripts/init_longrun.py --repo-root /tmp/codex-longrun-smoke --task-brief "Smoke test" --force
-```
-
-## Recommended next development tasks
-
-1. Validate the generated docs inside a real software repository.
-2. Add a second skill for `codex-longrun-freeze-review` if repeated use shows that separate skills are clearer.
-3. Improve review schema validation.
-4. Add optional worktree ticket scaffolding.
-5. Add release instructions once the first public repo commit exists.
+- Scripts do not validate JSON schemas without an optional schema dependency.
+- Review normalizer deduplicates by simple claim/files key, not semantic equivalence.
+- The skill does not configure Codex sandbox or approval policy.
+- The skill does not push to GitHub or create PRs.

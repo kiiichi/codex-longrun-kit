@@ -1,60 +1,36 @@
 # Agent instructions for codex-longrun-kit
 
-This repository is itself a Codex Skill kit. Future Codex threads should treat project documentation as the source of truth.
+Read `docs/PROJECT_STATE.md` before making changes. Then read `docs/DEVELOPMENT_GOALS.md` and `docs/TECHNICAL_ROUTE.md` if the task affects design.
 
-## Start here
+## Project purpose
 
-Before changing code, read these files in order:
+This repo provides a Codex skill that initializes target repositories for compact, reviewable long-running Codex work.
 
-1. `README.md`
-2. `docs/PROJECT_STATE.md`
-3. `PROJECT.md`
-4. `docs/ARCHITECTURE.md`
-5. `.agents/skills/codex-longrun-init/SKILL.md`
-6. `docs/TECHNICAL_ROUTE.md`
+The main design choice in v0.2 is **compact runtime docs**:
 
-## Current objective
-
-Improve a skill named `codex-longrun-init` that initializes target repositories for long-running Codex tasks. The skill should create a durable scaffold around task contract, milestone plan, execution runbook, continuity ledger, validation matrix, stop rules, review packet, and feedback normalization.
+- Default target output: `docs/agent/LONGRUN.md` + `docs/agent/STATE.md`.
+- Review output is lazy: `REVIEW.md` and `docs/reviews/` are created at freeze time.
+- Strict split files are optional: `STOP_RULES.md` and `VALIDATION_MATRIX.md` are generated only in `--profile strict`.
 
 ## Development rules
 
-- Keep v0.1 simple: skill folder + templates + Python scripts + docs.
-- Do not introduce a daemon, database, MCP server, or plugin packaging unless explicitly requested.
-- Prefer standard-library Python. `PyYAML` may be used when available for YAML review files.
-- Do not change the generated file contract without updating:
-  - `.agents/skills/codex-longrun-init/SKILL.md`
-  - templates in `assets/templates/`
-  - `README.md`
-  - `docs/PROJECT_STATE.md`
-  - tests
-- Do not make the skill auto-implement by default. It should stop after initialization and planning unless the user explicitly asks for execution.
-- Keep subagents read-only by default in the skill instructions.
-- Maintain no-overwrite behavior in `init_longrun.py` unless `--force` is passed.
+- Keep `SKILL.md` concise and agent-facing.
+- Prefer scripts for deterministic file generation and normalization.
+- Prefer references for optional deep guidance.
+- Do not increase the number of default generated runtime docs without updating `docs/DECISIONS.md`.
+- Tests must pass before packaging.
 
-## Validation commands
-
-Run these after script or template changes:
+## Validation
 
 ```bash
-python -m pytest
-python .agents/skills/codex-longrun-init/scripts/detect_stack.py --repo-root . --format markdown
-python .agents/skills/codex-longrun-init/scripts/init_longrun.py --repo-root /tmp/codex-longrun-smoke --task-brief "Smoke test" --force
+python -m unittest discover -s tests
+python scripts/init_longrun.py --target /tmp/longrun-smoke --profile standard --task-brief "Smoke task" --force
+python scripts/freeze_review.py --target /tmp/longrun-smoke --base HEAD
+python scripts/normalize_reviews.py --target /tmp/longrun-smoke
 ```
 
-The smoke command creates files in `/tmp/codex-longrun-smoke`, not in this repository.
+## Packaging
 
-## Project status update rule
-
-After meaningful work, update `docs/PROJECT_STATE.md` with:
-
-- what changed
-- validation performed
-- remaining risks
-- recommended next step
-
-## Style
-
-- Documentation should be direct and operational.
-- Scripts should have clear CLI help, typed functions where practical, and deterministic output.
-- Templates should be useful immediately after generation and should not rely on hidden chat context.
+```bash
+python -m zipfile -c ../codex-longrun-kit.zip .
+```

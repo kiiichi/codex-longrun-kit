@@ -1,0 +1,22 @@
+{
+  "reviewer_lane": "architecture",
+  "base_commit": "abc123",
+  "findings": [
+    {
+      "id": "ARCH-001",
+      "severity": "P2",
+      "claim": "Settings form validation should remain behind the existing form adapter boundary.",
+      "evidence": {
+        "files": ["src/settings/SettingsForm.tsx"],
+        "observed": "New validation logic is inline in the component."
+      },
+      "affected_files": ["src/settings/SettingsForm.tsx", "src/settings/formAdapter.ts"],
+      "acceptance_criteria": [
+        "Validation behavior is exposed through the existing form adapter.",
+        "Component remains focused on rendering and event wiring."
+      ],
+      "validation_commands": ["npm test -- settings", "npm run typecheck"],
+      "requires_human_decision": false
+    }
+  ]
+}

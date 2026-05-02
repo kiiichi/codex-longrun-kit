@@ -1,0 +1,38 @@
+# STOP_RULES.md
+
+Strict-profile split file. If this file exists, it overrides the stop-rules section in `LONGRUN.md`.
+
+## Must stop and ask
+
+- Secrets, tokens, `.env`, production data, deployment, or external side effects are required.
+- Auth, payment, permissions, encryption, data retention, or destructive migration changes exceed the plan.
+- Validation fails twice after focused repair attempts.
+- Scope expands beyond the current milestone.
+- Product behavior, architecture, or data model choice is genuinely ambiguous.
+- Destructive git or filesystem commands are needed.
+- This file needs to change.
+
+## Allowed without asking
+
+- Local reads and searches.
+- Local repo edits that match the active milestone.
+- Local lint, typecheck, test, build, and non-destructive smoke checks.
+- Small test updates that verify observable behavior.
+
+## Forbidden
+
+- Committing secrets.
+- Production deployment.
+- `curl | sh` installs.
+- Destructive git commands unless explicitly requested.
+- Writing outside the workspace.
+
+## Escalation format
+
+When stopping, report:
+
+- Triggered rule:
+- Evidence:
+- Options:
+- Recommendation:
+- Minimum human decision needed:

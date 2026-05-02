@@ -1,65 +1,42 @@
 # Technical route
 
-## v0.1: Single initialization skill
+## v0.1 baseline
 
-Target:
+- Root-level Codex skill.
+- Templates for task contract, plan, implementation, continuity, stop rules, validation, review packet.
+- Scripts for initialization, review freeze, and review normalization.
 
-- one skill: `codex-longrun-init`
-- one initialization script
-- one stack detection script
-- review freeze script
-- review normalization script
-- stable documentation
+## v0.2 route
 
-Rationale:
+Reduce default runtime docs:
 
-The user value comes first from reducing setup friction and making long-run state durable. Complex automation can wait.
+```text
+LONGRUN.md = task contract + milestones + execution rules + stop rules + validation gates
+STATE.md   = compact handoff ledger
+REVIEW.md  = lazy review freeze artifact
+```
 
-## v0.2: Better validation and schema checks
+Add profiles:
 
-Potential work:
+```text
+minimal  -> LONGRUN.md + STATE.md
+standard -> LONGRUN.md + STATE.md, review docs lazy
+strict   -> standard + STOP_RULES.md + VALIDATION_MATRIX.md
+```
 
-- JSON Schema for `ReviewQueue.json`
-- stricter validation for review YAML
-- template snapshot tests
-- richer stack detection
-- clearer generated `Plan.md` milestone examples
+## Future route
 
-## v0.3: Split workflow skills
+v0.3 candidates:
 
-Potential separate skills:
+- `--update-agents` option to add a short `## Codex long-run` block to target repo `AGENTS.md`.
+- `--ticket RQ-001` patch-worker prompt generator.
+- Better semantic conflict detection in review normalization.
+- Optional GitHub issue creation for ReviewQueue tickets.
+- Optional worktree command generation for parallel patch workers.
 
-- `codex-longrun-plan`
-- `codex-longrun-execute`
-- `codex-longrun-freeze-review`
-- `codex-longrun-normalize-feedback`
+## Constraints
 
-Rationale:
-
-A single init skill is easier to install. Separate skills may be clearer once the workflow is used often.
-
-## v0.4: Worktree-aware repair flow
-
-Potential work:
-
-- create a branch/worktree for each independent review ticket
-- track ticket status under `docs/reviews/status/`
-- generate merge guidance
-- detect changed-file overlap before patching
-
-## v0.5: Plugin packaging
-
-Potential work:
-
-- package skill set as a plugin
-- add release metadata
-- document install/update lifecycle
-- optionally integrate with richer tools
-
-## Explicit deferrals
-
-- No autonomous deployment.
-- No automatic sandbox/approval modification.
-- No background daemon.
-- No database.
-- No default write-capable subagents.
+- Python scripts must use only the standard library.
+- Generated files must be safe to commit.
+- Default templates must avoid secrets, external network, and approval changes.
+- The skill must be useful even when GitHub CLI is unavailable.

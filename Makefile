@@ -1,12 +1,13 @@
-.PHONY: test smoke detect
+.PHONY: test smoke package
 
 test:
-	python -m pytest
-
-detect:
-	python .agents/skills/codex-longrun-init/scripts/detect_stack.py --repo-root . --format markdown
+	python -m unittest discover -s tests
 
 smoke:
-	rm -rf /tmp/codex-longrun-smoke
-	python .agents/skills/codex-longrun-init/scripts/init_longrun.py --repo-root /tmp/codex-longrun-smoke --task-brief "Smoke test" --force
-	find /tmp/codex-longrun-smoke/docs -maxdepth 3 -type f | sort
+	rm -rf /tmp/codex-longrun-kit-smoke
+	python scripts/init_longrun.py --target /tmp/codex-longrun-kit-smoke --profile standard --task-brief "Smoke task"
+	python scripts/freeze_review.py --target /tmp/codex-longrun-kit-smoke --base HEAD
+	python scripts/normalize_reviews.py --target /tmp/codex-longrun-kit-smoke
+
+package:
+	cd .. && python -m zipfile -c codex-longrun-kit.zip codex-longrun-kit
