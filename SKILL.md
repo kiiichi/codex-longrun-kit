@@ -1,6 +1,6 @@
 ---
 name: codex-longrun-kit
-description: Initialize a repository for compact, reviewable long-running Codex work by creating runtime artifacts: LONGRUN.md, STATE.md, and a lazy review workflow. Use when the user wants a multi-hour implementation, migration, refactor, or reviewable autonomous coding task. Skip for small one-shot edits.
+description: "Initialize a repository for compact, reviewable long-running Codex work by creating runtime artifacts: LONGRUN.md, STATE.md, and a lazy review workflow. Use when the user wants a multi-hour implementation, migration, refactor, or reviewable autonomous coding task. Skip for small one-shot edits."
 ---
 
 # Codex Longrun Kit
