@@ -1,6 +1,6 @@
 # Independent review reports
 
-One lane, one JSON file under `docs/reviews/pending/`.
+One lane, one JSON file under `docs/agent/longrun/reviews/pending/`.
 
 Before review close: reviewers work independently.
 
@@ -14,5 +14,5 @@ invoke $codex-longrun-kit normalize review feedback
 
 Output:
 
-- `docs/reviews/ReviewQueue.json`
-- `docs/reviews/HumanDecisionsNeeded.md`
+- `docs/agent/longrun/reviews/ReviewQueue.json`
+- `docs/agent/longrun/reviews/HumanDecisionsNeeded.md`

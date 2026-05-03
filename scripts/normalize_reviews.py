@@ -28,7 +28,7 @@ def load_reports(pending: Path) -> list[dict[str, Any]]:
         return reports
     for path in sorted(pending.glob("*.json")):
         try:
-            data = json.loads(path.read_text(encoding="utf-8"))
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
             data["_source_path"] = str(path)
             reports.append(data)
         except json.JSONDecodeError as exc:
@@ -64,8 +64,8 @@ def unique_extend(out: list[str], values: Any) -> None:
 
 def normalize(target: Path) -> dict[str, Any]:
     target = target.resolve()
-    pending = target / "docs" / "reviews" / "pending"
-    outdir = target / "docs" / "reviews"
+    outdir = target / "docs" / "agent" / "longrun" / "reviews"
+    pending = outdir / "pending"
     outdir.mkdir(parents=True, exist_ok=True)
 
     reports = load_reports(pending)
@@ -151,7 +151,7 @@ def main() -> int:
     parser.add_argument("--target", "--target-root", dest="target", default=".", help="Target repo root")
     args = parser.parse_args()
     queue = normalize(Path(args.target))
-    print(f"Wrote docs/reviews/ReviewQueue.json with {len(queue['tickets'])} tickets.")
+    print(f"Wrote docs/agent/longrun/reviews/ReviewQueue.json with {len(queue['tickets'])} tickets.")
     if queue["human_decisions_needed"]:
         print("Human decisions are required before fixing some tickets.")
     print("Reminder: ReviewQueue.json is a draft repair queue. Fix one ticket at a time.")

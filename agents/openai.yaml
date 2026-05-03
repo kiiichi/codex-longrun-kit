@@ -1,6 +1,6 @@
 interface:
   display_name: "Codex Longrun Kit"
   short_description: "Initialize compact, reviewable long-running Codex tasks."
-  default_prompt: "Use $codex-longrun-kit to initialize this repository for a long-running Codex task. Do not implement yet; stop at plan review."
+  default_prompt: "Use $codex-longrun-kit to initialize this repository for a long-running Codex task. Create docs under docs/agent/longrun/. Do not implement yet; stop at plan review."
 policy:
   allow_implicit_invocation: false

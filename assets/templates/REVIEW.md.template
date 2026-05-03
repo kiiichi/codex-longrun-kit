@@ -45,7 +45,7 @@ Each reviewer works independently against the same frozen version.
 
 ## Report format
 
-Write one JSON report per lane under `docs/reviews/pending/<lane>.json`.
+Write one JSON report per lane under `docs/agent/longrun/reviews/pending/<lane>.json`.
 
 ```json
 {
@@ -76,4 +76,4 @@ invoke $codex-longrun-kit normalize review feedback
 
 Skill package owns the helper. Target repo owns generated docs.
 
-Then fix `docs/reviews/ReviewQueue.json` tickets one at a time. HITL tickets wait for human decision.
+Then fix `docs/agent/longrun/reviews/ReviewQueue.json` tickets one at a time. HITL tickets wait for human decision.

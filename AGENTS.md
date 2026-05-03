@@ -16,7 +16,7 @@ Style:
 
 Development rules:
 
-- Keep default target output small: `LONGRUN.md` + `STATE.md`.
+- Keep default target output small: `docs/agent/longrun/LONGRUN.md` + `docs/agent/longrun/STATE.md`.
 - Create review artifacts lazily.
 - Keep helper scripts standard-library Python.
 - Scripts create artifacts. Humans or Codex decide next actions from those artifacts.

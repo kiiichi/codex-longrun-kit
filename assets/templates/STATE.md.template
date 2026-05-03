@@ -1,12 +1,12 @@
 # STATE.md
 
-Read: session start, resume after compaction, before code edits.
+Read: session start, resume after compaction, before code edits, user stop.
 Update: milestone, validation, decision, HITL stop, or next action changes.
 Keep: current snapshot, not log. Target under 80 lines.
 
 ## Snapshot
 
-Current milestone: M1 — Scope and baseline
+Current milestone: M1 - Scope and baseline
 Current status: initialized
 Next action: review `LONGRUN.md`, resolve `UNCONFIRMED` items, then decide whether to implement.
 
@@ -16,7 +16,8 @@ Next action: review `LONGRUN.md`, resolve `UNCONFIRMED` items, then decide wheth
 
 ## Decisions
 
-- Runtime docs stay compact: `LONGRUN.md` + `STATE.md`.
+- Runtime docs stay compact and namespaced under `docs/agent/longrun/`.
+- Lifecycle is plan -> longrun -> closeout.
 
 ## Validation
 
@@ -34,11 +35,21 @@ Known failures:
 - UNCONFIRMED: final done criteria.
 - UNCONFIRMED: validation gates required before review freeze.
 
+## Source docs
+
+Read:
+- UNCONFIRMED: root `AGENTS.md`.
+- UNCONFIRMED: `README`.
+- UNCONFIRMED: project docs.
+
+Conflicts:
+- None recorded.
+
 ## Working set
 
 Files changed:
-- `docs/agent/LONGRUN.md`
-- `docs/agent/STATE.md`
+- `docs/agent/longrun/LONGRUN.md`
+- `docs/agent/longrun/STATE.md`
 
 Likely next files:
 - UNCONFIRMED.
@@ -47,3 +58,4 @@ Likely next files:
 
 Commit: UNCONFIRMED
 Review freeze: none
+Closeout: not started

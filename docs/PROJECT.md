@@ -2,13 +2,13 @@
 
 ## Version
 
-v0.3.2 language compact.
+v0.3.3 longrun namespace and lifecycle.
 
 ## Goal
 
 Deployable Codex skill for compact long-run scaffolding.
 
-Outcome: target repos get enough structure for long execution, recovery, validation, and review freeze without document bloat.
+Outcome: target repos get enough structure for planning, long execution, recovery, closeout, validation, and review freeze without document bloat or doc pollution.
 
 ## Architecture
 
@@ -25,11 +25,23 @@ docs/PROJECT.md           # this handoff
 Default:
 
 ```text
-docs/agent/LONGRUN.md
-docs/agent/STATE.md
+docs/agent/longrun/LONGRUN.md
+docs/agent/longrun/STATE.md
 ```
 
-Review freeze creates `REVIEW.md` and `docs/reviews/*`. Strict profile adds one `STRICT.md` appendix.
+Review freeze creates `docs/agent/longrun/REVIEW.md` and `docs/agent/longrun/reviews/*`. Strict profile adds one `docs/agent/longrun/STRICT.md` appendix.
+
+## Lifecycle
+
+```text
+plan -> longrun -> closeout
+```
+
+Plan owns current state, target goal, source docs, blockers, and validation gates.
+
+Longrun owns milestone execution and current `STATE.md`.
+
+Closeout owns final status, validation, open risks, handoff, and next resume action. User stop, pause, interrupt, or closeout request enters closeout immediately.
 
 ## Boundaries
 
@@ -60,6 +72,7 @@ invoke $codex-longrun-kit normalize review feedback
 - v0.3: compact default output, one project handoff doc.
 - v0.3.1: fix target-repo / script-location mismatch.
 - v0.3.2: rewrite language layer for dense operational instructions.
+- v0.3.3: namespace runtime docs under `docs/agent/longrun/`; add plan / longrun / closeout lifecycle.
 - v0.4: optional review-report schema validation.
 - v0.5: optional worktree patch-ticket workflow.
 

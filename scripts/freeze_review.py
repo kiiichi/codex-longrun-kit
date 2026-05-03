@@ -61,8 +61,8 @@ def freeze(target: Path, base: str, force: bool = False) -> list[str]:
     }
 
     written: list[str] = []
-    docs_agent = target / "docs" / "agent"
-    docs_reviews = target / "docs" / "reviews"
+    docs_agent = target / "docs" / "agent" / "longrun"
+    docs_reviews = docs_agent / "reviews"
     review_artifacts = target / ".codex_artifacts" / "review"
 
     for path in [docs_agent, docs_reviews / "pending", docs_reviews / "status", review_artifacts]:
@@ -96,7 +96,7 @@ def main() -> int:
             print(f"- {item}")
     else:
         print("No files written. Existing review files preserved. Use --force only with explicit user approval.")
-    print("Next: stop product-code changes; reviewers write independent JSON reports under docs/reviews/pending/.")
+    print("Next: stop product-code changes; reviewers write independent JSON reports under docs/agent/longrun/reviews/pending/.")
     print("Then invoke: $codex-longrun-kit normalize review feedback")
     print("Reminder: REVIEW.md defines review protocol. Approval comes from reports or user sign-off.")
     return 0

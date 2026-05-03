@@ -57,7 +57,7 @@ def init(target: Path, profile: str, task_brief: str, force: bool = False) -> li
     }
 
     written: list[str] = []
-    docs_agent = target / "docs" / "agent"
+    docs_agent = target / "docs" / "agent" / "longrun"
     for name in ["LONGRUN.md", "STATE.md"]:
         content = render(read_template(f"{name}.template"), mapping)
         if write_file(docs_agent / name, content, force=force):
@@ -91,7 +91,7 @@ def main() -> int:
             print(f"- {item}")
     else:
         print("No files written. Existing files preserved. Use --force only with explicit user approval.")
-    print("Next: inspect docs/agent/LONGRUN.md and docs/agent/STATE.md, then stop for plan review.")
+    print("Next: inspect docs/agent/longrun/LONGRUN.md and docs/agent/longrun/STATE.md, then stop for plan review.")
     print("Reminder: validation commands are candidates. Confirm gates during M1.")
     return 0
 

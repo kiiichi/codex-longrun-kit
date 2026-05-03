@@ -4,6 +4,8 @@ Small runtime. Clear authority. Lazy detail.
 
 ## Artifacts
 
+Runtime namespace: `docs/agent/longrun/`.
+
 `LONGRUN.md` = task contract.
 
 Contains goal, done criteria, non-goals, hard constraints, milestones, HITL stops, validation gates.
@@ -19,6 +21,20 @@ Created at review freeze. Defines frozen commit, lanes, report format, and feedb
 `STRICT.md` = optional appendix.
 
 Created only in strict profile. Adds cost policy, escalation format, and long-running-process pattern.
+
+`reviews/` = independent review reports and normalized repair queue.
+
+Created only at review freeze.
+
+## Lifecycle
+
+Plan: confirm current state, target goal, source docs, blockers, validation gates.
+
+Longrun: execute one milestone at a time; update `STATE.md` after status, validation, decision, or next-action changes.
+
+Closeout: stop new work; record final status, validation, open risks, handoff, and next resume action.
+
+User-directed stop enters closeout immediately. Unknown validation is `UNCONFIRMED`.
 
 ## Truth order
 

@@ -1,15 +1,28 @@
 # LONGRUN.md
 
-Read: start long-run work; choose milestone; check HITL stops; prepare review freeze.
+Read: plan start, session resume, milestone switch, user stop, review freeze.
 Update: task contract, milestones, validation gates, or HITL stops change.
 Keep: compact, factual, quick for a new thread to read.
 
 ## Runtime truth
 
 - `LONGRUN.md` is the task contract.
+- Runtime namespace: `docs/agent/longrun/`.
 - Code, git state, and test output are evidence.
 - Validation commands start as candidates. M1 confirms required, optional, expensive, and flaky gates.
 - Scripts create artifacts. Humans or Codex decide next actions from those artifacts.
+
+## Lifecycle
+
+```text
+plan -> longrun -> closeout
+```
+
+1. Plan: confirm current state, target goal, source docs, blockers, gates.
+2. Longrun: work one milestone; update `STATE.md` after status, validation, decision, or next-action change.
+3. Closeout: stop new work; record final status, validation, open risks, handoff, and next resume action.
+
+User-directed stop enters closeout immediately. Record unknown validation as `UNCONFIRMED`.
 
 ## Task contract
 
@@ -29,28 +42,41 @@ Hard constraints:
 - Scope changes update this file before implementation continues.
 - Long-running servers use background process + log + PID + health check + cleanup.
 
+## Source docs
+
+- UNCONFIRMED: root `AGENTS.md` read.
+- UNCONFIRMED: `README` read.
+- UNCONFIRMED: project docs read.
+
+Doc conflicts:
+- None recorded.
+
 ## Shared terms
 
 - **AFK**: proceed without more human input while gates pass.
+- **Plan**: inspect repo state and draft the task contract.
+- **Longrun**: execute milestones under this contract.
+- **Closeout**: stop new work and leave a reliable handoff.
 - **HITL**: human decision required.
 - **Review freeze**: product-code edits stop; review artifacts start.
 - **Validation gate**: command or manual check used as evidence.
 
 ## Milestones
 
-### M1 — Scope and baseline
+### M1 - Scope and baseline
 
 Type: HITL until unknowns resolve.
 
 Acceptance criteria:
 - [ ] Project shape understood.
+- [ ] Source docs read and conflicts listed.
 - [ ] Required validation commands confirmed.
 - [ ] Blocking unknowns listed.
 
 Validation candidates:
 {{FAST_VALIDATION}}
 
-### M2 — First vertical slice
+### M2 - First vertical slice
 
 Type: AFK if M1 has no blockers.
 
@@ -62,7 +88,7 @@ Acceptance criteria:
 Validation candidates:
 {{TARGETED_VALIDATION}}
 
-### M3 — Remaining slices
+### M3 - Remaining slices
 
 Type: AFK only for independent slices.
 
@@ -74,14 +100,14 @@ Acceptance criteria:
 Validation candidates:
 {{FULL_VALIDATION}}
 
-### M4 — Review freeze
+### M4 - Review freeze
 
 Type: HITL.
 
 Acceptance criteria:
 - [ ] Product-code edits stopped.
-- [ ] `docs/agent/REVIEW.md` generated.
-- [ ] Independent reports can land under `docs/reviews/pending/`.
+- [ ] `docs/agent/longrun/REVIEW.md` generated.
+- [ ] Independent reports can land under `docs/agent/longrun/reviews/pending/`.
 
 Validation candidates:
 {{FREEZE_VALIDATION}}
@@ -93,6 +119,14 @@ Validation candidates:
 - Keep patches reviewable.
 - Run the relevant validation gate before moving on.
 - Update `STATE.md` after meaningful status, decision, validation, or next-action changes.
+- User-directed stop enters closeout. Do not start new work.
+
+## Closeout rules
+
+- Stop product-code edits unless the user explicitly resumes.
+- Update `STATE.md` with status, validation, known failures, open questions, working set, and next action.
+- Mark unfinished validation as `UNCONFIRMED`.
+- Enter review freeze only when requested, required by plan, or needed for approval.
 
 ## HITL stops
 
@@ -105,6 +139,7 @@ Human decision required when:
 - product behavior, architecture, or data model is ambiguous
 - destructive git or filesystem command is needed
 - HITL stop rules need changes
+- user-directed stop, pause, interrupt, or closeout request
 
 ## Allowed AFK work
 
