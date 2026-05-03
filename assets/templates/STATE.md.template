@@ -1,8 +1,8 @@
 # STATE.md
 
-Read when: starting/resuming a session, after compaction, before editing code.
-Update when: milestone, validation, decision, stop rule, or next action changes.
-Do not: write logs, record guesses as facts, or exceed 80 lines.
+Read: session start, resume after compaction, before code edits.
+Update: milestone, validation, decision, HITL stop, or next action changes.
+Keep: current snapshot, not log. Target under 80 lines.
 
 ## Snapshot
 
@@ -16,12 +16,12 @@ Next action: review `LONGRUN.md`, resolve `UNCONFIRMED` items, then decide wheth
 
 ## Decisions
 
-- Default runtime docs are compact: `LONGRUN.md` + `STATE.md`.
+- Runtime docs stay compact: `LONGRUN.md` + `STATE.md`.
 
 ## Validation
 
 Last commands:
-- Not run yet.
+- None.
 
 Result:
 - UNCONFIRMED.
@@ -32,7 +32,7 @@ Known failures:
 ## Open questions
 
 - UNCONFIRMED: final done criteria.
-- UNCONFIRMED: validation commands that must pass before review freeze.
+- UNCONFIRMED: validation gates required before review freeze.
 
 ## Working set
 
@@ -46,4 +46,4 @@ Likely next files:
 ## Last reliable checkpoint
 
 Commit: UNCONFIRMED
-Review freeze: not created
+Review freeze: none

@@ -3,7 +3,7 @@
   "base_commit": "UNCONFIRMED",
   "created_at": "UNCONFIRMED",
   "notes": [
-    "This queue is a draft normalization artifact, not an automatic execution plan."
+    "ReviewQueue.json is a draft repair queue."
   ],
   "tickets": [],
   "duplicates": [],

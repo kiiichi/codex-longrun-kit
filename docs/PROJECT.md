@@ -1,44 +1,66 @@
 # Project handoff
 
-## Current version
+## Version
 
-v0.3 compact architecture.
+v0.3.2 language compact.
 
 ## Goal
 
-Create a deployable Codex skill that initializes repositories for long-running, reviewable Codex tasks while avoiding document bloat.
+Deployable Codex skill for compact long-run scaffolding.
+
+Outcome: target repos get enough structure for long execution, recovery, validation, and review freeze without document bloat.
 
 ## Architecture
 
 ```text
 SKILL.md                  # compact agent-facing workflow
 assets/templates/         # generated runtime docs
-scripts/                  # deterministic helpers
+scripts/                  # artifact helpers
 references/               # optional detail, loaded on demand
-docs/PROJECT.md           # this project handoff doc
+docs/PROJECT.md           # this handoff
 ```
 
-## Runtime output
+## Target repo output
 
-Default generated files in a target repo:
+Default:
 
 ```text
 docs/agent/LONGRUN.md
 docs/agent/STATE.md
 ```
 
-Review files are created only at review freeze. Strict detail is one optional `STRICT.md` appendix.
+Review freeze creates `REVIEW.md` and `docs/reviews/*`. Strict profile adds one `STRICT.md` appendix.
 
 ## Boundaries
 
-Scripts may create docs, inspect visible project files, read git metadata, and normalize review JSON. They must not run project tests, install dependencies, access secrets, deploy, or modify product code.
+Scripts create artifacts. Humans or Codex decide next actions from those artifacts.
 
-`REVIEW.md` is a protocol for frozen-version review. It is written for human reviewers and optional read-only review agents. It is not Codex self-approval.
+Scripts may:
+
+- create compact runtime docs
+- inspect visible project files
+- read git metadata
+- normalize review JSON
+
+HITL owns:
+
+- secrets, production, deployment, remote writes
+- sandbox and approval changes
+- destructive commands
+- product, security, data, architecture, UX judgment
+
+Script location: skill repo owns scripts. Target repo owns generated docs. Target-repo docs use:
+
+```text
+invoke $codex-longrun-kit normalize review feedback
+```
 
 ## Roadmap
 
-- v0.3: compact default output, safer script language, one project handoff doc.
-- v0.4: optional schema validation for review reports.
+- v0.3: compact default output, one project handoff doc.
+- v0.3.1: fix target-repo / script-location mismatch.
+- v0.3.2: rewrite language layer for dense operational instructions.
+- v0.4: optional review-report schema validation.
 - v0.5: optional worktree patch-ticket workflow.
 
 ## Validation
@@ -51,5 +73,5 @@ python -m unittest discover -s tests
 
 - Stack detection is heuristic.
 - Review normalization is heuristic.
-- Freeze scripts record metadata but cannot truly prevent later code changes.
-- Generated docs still require plan review before long execution.
+- Freeze metadata records state; git remains mutable.
+- Plan review still gates long execution.

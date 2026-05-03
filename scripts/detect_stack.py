@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-"""Suggest candidate validation commands for compact Codex long-run docs.
+"""Detect candidate validation gates.
 
-This script is read-only. It inspects visible project files and prints likely
-commands. It does not install dependencies, run project commands, or modify
-source files. Treat output as candidates until confirmed.
+Read visible project files. Return candidates. Leave repo state unchanged.
 """
 from __future__ import annotations
 
@@ -128,7 +126,7 @@ def detect(root: Path) -> dict[str, Any]:
         }
     return {
         "root": str(root),
-        "notes": ["Detected commands are candidates. Confirm before using them as validation gates."],
+        "notes": ["Detected commands are candidates. Confirm before promoting to validation gates."],
         "commands": commands,
     }
 

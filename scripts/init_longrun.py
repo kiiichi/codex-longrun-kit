@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Initialize compact long-running Codex runtime docs in a target repo.
+"""Initialize compact long-run runtime docs.
 
-Writes generated docs only. Does not modify product code, run validation,
-install dependencies, change approvals, or contact remote services.
+Create artifacts only. Product code, dependencies, approvals, secrets, deployments, and remote state stay untouched.
 """
 from __future__ import annotations
 
@@ -93,7 +92,7 @@ def main() -> int:
     else:
         print("No files written. Existing files preserved. Use --force only with explicit user approval.")
     print("Next: inspect docs/agent/LONGRUN.md and docs/agent/STATE.md, then stop for plan review.")
-    print("Reminder: generated validation commands are candidates, not proof.")
+    print("Reminder: validation commands are candidates. Confirm gates during M1.")
     return 0
 
 

@@ -1,15 +1,15 @@
 # LONGRUN.md
 
-Read when: starting long-run work; choosing a milestone; checking stop rules; preparing review freeze.
-Update when: task contract, milestones, validation gates, or stop rules change.
-Do not: store logs, record guesses as facts, or exceed what a new thread can read quickly.
+Read: start long-run work; choose milestone; check HITL stops; prepare review freeze.
+Update: task contract, milestones, validation gates, or HITL stops change.
+Keep: compact, factual, quick for a new thread to read.
 
-## Authority
+## Runtime truth
 
-- This file is the task contract, not proof of correctness.
-- Validation commands below are candidates until confirmed.
-- Scripts may generate or update docs, but they do not make decisions.
-- If this file conflicts with code, git, or test output, investigate and update it.
+- `LONGRUN.md` is the task contract.
+- Code, git state, and test output are evidence.
+- Validation commands start as candidates. M1 confirms required, optional, expensive, and flaky gates.
+- Scripts create artifacts. Humans or Codex decide next actions from those artifacts.
 
 ## Task contract
 
@@ -18,34 +18,34 @@ Goal:
 
 Done when:
 - [ ] UNCONFIRMED: define final observable outcome.
-- [ ] Required validation gates pass or are explicitly waived by the user.
+- [ ] Required validation gates pass or receive explicit user waiver.
 - [ ] `STATE.md` reflects final status.
 
 Non-goals:
-- [ ] UNCONFIRMED: list work that should not be done in this run.
+- [ ] UNCONFIRMED: list work outside this run.
 
 Hard constraints:
-- Do not access secrets, production systems, deployment targets, or external services unless explicitly approved.
-- Do not expand scope beyond the milestones below without updating this file.
-- Do not start long-running servers in the foreground.
+- HITL approval covers secrets, production, deployment, remote writes, external side effects, and approval changes.
+- Scope changes update this file before implementation continues.
+- Long-running servers use background process + log + PID + health check + cleanup.
 
 ## Shared terms
 
-- **AFK**: can proceed without more human input if validation passes.
-- **HITL**: requires a human decision.
-- **Review freeze**: stop modifying product code and prepare review artifacts.
+- **AFK**: proceed without more human input while gates pass.
+- **HITL**: human decision required.
+- **Review freeze**: product-code edits stop; review artifacts start.
 - **Validation gate**: command or manual check used as evidence.
 
 ## Milestones
 
 ### M1 — Scope and baseline
 
-Type: HITL until unknowns are resolved.
+Type: HITL until unknowns resolve.
 
 Acceptance criteria:
-- [ ] Project shape is understood.
-- [ ] Required validation commands are confirmed.
-- [ ] Blocking unknowns are listed.
+- [ ] Project shape understood.
+- [ ] Required validation commands confirmed.
+- [ ] Blocking unknowns listed.
 
 Validation candidates:
 {{FAST_VALIDATION}}
@@ -55,9 +55,9 @@ Validation candidates:
 Type: AFK if M1 has no blockers.
 
 Acceptance criteria:
-- [ ] A narrow end-to-end slice is implemented.
-- [ ] Behavior is verified through tests or checks.
-- [ ] Diff is scoped to this slice.
+- [ ] Narrow end-to-end slice implemented.
+- [ ] Behavior verified through tests or checks.
+- [ ] Diff scoped to this slice.
 
 Validation candidates:
 {{TARGETED_VALIDATION}}
@@ -67,9 +67,9 @@ Validation candidates:
 Type: AFK only for independent slices.
 
 Acceptance criteria:
-- [ ] Agreed slices are completed one at a time.
-- [ ] Validation evidence is updated after each slice.
-- [ ] No unrelated cleanup is mixed in.
+- [ ] Agreed slices completed one at a time.
+- [ ] Validation evidence updated after each slice.
+- [ ] No unrelated cleanup mixed in.
 
 Validation candidates:
 {{FULL_VALIDATION}}
@@ -79,37 +79,36 @@ Validation candidates:
 Type: HITL.
 
 Acceptance criteria:
-- [ ] Product code modifications stop.
-- [ ] `docs/agent/REVIEW.md` is generated.
-- [ ] Reviewers can write independent reports under `docs/reviews/pending/`.
+- [ ] Product-code edits stopped.
+- [ ] `docs/agent/REVIEW.md` generated.
+- [ ] Independent reports can land under `docs/reviews/pending/`.
 
 Validation candidates:
 {{FREEZE_VALIDATION}}
 
 ## Execution rules
 
-- Work one milestone at a time.
-- Prefer vertical slices over horizontal layer-by-layer work.
-- Keep patches small enough to review.
+- Work one milestone.
+- Prefer vertical slices over horizontal layer work.
+- Keep patches reviewable.
 - Run the relevant validation gate before moving on.
-- Update `STATE.md` only after meaningful status, decision, validation, or next-action changes.
-- For long-running servers, use background process + log + PID + cleanup.
+- Update `STATE.md` after meaningful status, decision, validation, or next-action changes.
 
-## Stop rules
+## HITL stops
 
-Must stop and ask if:
+Human decision required when:
 
-- Secrets, tokens, `.env`, production data, deployment, or external side effects are required.
-- Auth, payment, permissions, encryption, data retention, or destructive migration changes exceed the plan.
-- Validation fails twice after focused repair attempts.
-- Required fix expands beyond the active milestone.
-- Product behavior, architecture, or data model choice is genuinely ambiguous.
-- Destructive git or filesystem command is needed.
-- Stop rules need to change.
+- secrets, tokens, `.env`, production data, deployment, or external side effects enter scope
+- auth, payment, permissions, encryption, retention, or destructive migration exceeds plan
+- validation fails twice after focused repair
+- required fix expands beyond active milestone
+- product behavior, architecture, or data model is ambiguous
+- destructive git or filesystem command is needed
+- HITL stop rules need changes
 
-Allowed without asking:
+## Allowed AFK work
 
-- Local reads/searches.
-- Local repo edits matching the active milestone.
-- Local lint, typecheck, test, build, and non-destructive smoke checks.
-- Small tests that verify observable behavior.
+- local reads and searches
+- local repo edits matching the active milestone
+- local lint, typecheck, test, build, and non-destructive smoke checks
+- small tests that verify observable behavior

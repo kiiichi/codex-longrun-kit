@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Create lazy review artifacts for a frozen long-running Codex result.
+"""Create review-freeze artifacts.
 
-Writes review protocol files only. It does not freeze git itself, prevent future
-edits, review the code, or make product decisions.
+Record frozen-version metadata and review protocol. Git remains mutable; approval stays external.
 """
 from __future__ import annotations
 
@@ -34,7 +33,7 @@ def working_tree_status(target: Path) -> str:
         return "- UNCONFIRMED: git status unavailable."
     if not status:
         return "- Clean working tree reported by git."
-    lines = ["- WARNING: working tree has uncommitted changes. Review freeze is not stable until committed or explicitly recorded."]
+    lines = ["- WARNING: working tree has uncommitted changes. Stable review needs commit or explicit record."]
     lines.extend(f"- `{line}`" for line in status.splitlines()[:30])
     if len(status.splitlines()) > 30:
         lines.append("- Additional changes omitted from this summary.")
@@ -98,7 +97,8 @@ def main() -> int:
     else:
         print("No files written. Existing review files preserved. Use --force only with explicit user approval.")
     print("Next: stop product-code changes; reviewers write independent JSON reports under docs/reviews/pending/.")
-    print("Reminder: REVIEW.md is a protocol, not a review verdict.")
+    print("Then invoke: $codex-longrun-kit normalize review feedback")
+    print("Reminder: REVIEW.md defines review protocol. Approval comes from reports or user sign-off.")
     return 0
 
 

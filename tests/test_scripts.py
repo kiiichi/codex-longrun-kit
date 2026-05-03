@@ -32,7 +32,7 @@ class ScriptTests(unittest.TestCase):
             text = (target / "docs/agent/LONGRUN.md").read_text(encoding="utf-8")
             self.assertIn("Build X", text)
             self.assertIn("npm run lint", text)
-            self.assertIn("Scripts may generate or update docs", text)
+            self.assertIn("Scripts create artifacts", text)
 
     def test_init_strict_creates_one_appendix(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -59,7 +59,12 @@ class ScriptTests(unittest.TestCase):
             pending = target / "docs/reviews/pending"
             self.assertTrue((target / "docs/agent/REVIEW.md").exists())
             review_text = (target / "docs/agent/REVIEW.md").read_text(encoding="utf-8")
-            self.assertIn("review protocol, not a review verdict", review_text)
+            self.assertIn("defines the frozen version", review_text)
+            self.assertIn("invoke $codex-longrun-kit normalize review feedback", review_text)
+            self.assertNotIn("python scripts/normalize_reviews.py --target .", review_text)
+            reviews_readme = (target / "docs/reviews/README.md").read_text(encoding="utf-8")
+            self.assertIn("invoke $codex-longrun-kit normalize review feedback", reviews_readme)
+            self.assertNotIn("python scripts/normalize_reviews.py --target .", reviews_readme)
             pending.mkdir(parents=True, exist_ok=True)
             (pending / "security.json").write_text(json.dumps({
                 "reviewer_lane": "security",

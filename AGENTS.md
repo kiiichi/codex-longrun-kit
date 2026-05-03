@@ -1,28 +1,29 @@
-# Agent instructions for codex-longrun-kit
+# Agent instructions
 
-Read `docs/PROJECT.md` before changing this repo.
+Project goal: compact Codex skill for long-running, reviewable work.
 
-## Purpose
+Read first:
 
-This repo provides a Codex skill that initializes target repos for compact, reviewable long-running Codex work.
+- `SKILL.md`
+- `docs/PROJECT.md`
 
-## Design constraints
+Style:
 
-- Keep `SKILL.md` short and agent-facing.
-- Default generated runtime docs stay at `LONGRUN.md` + `STATE.md`.
-- `REVIEW.md` is lazy, created only at freeze time.
-- Strict mode creates one `STRICT.md` appendix, not multiple split files.
-- Scripts are helpers; they must not make product decisions or touch product code.
-- Do not add new default docs, scripts, or reference files without updating `docs/PROJECT.md`.
+- High-density operational language.
+- Prefer positive contracts over defensive caveats.
+- Use negative rules only for hard stops or observed failure modes.
+- Every hard stop needs the replacement action or HITL route.
 
-## Validation
+Development rules:
+
+- Keep default target output small: `LONGRUN.md` + `STATE.md`.
+- Create review artifacts lazily.
+- Keep helper scripts standard-library Python.
+- Scripts create artifacts. Humans or Codex decide next actions from those artifacts.
+- Target repo docs use `invoke $codex-longrun-kit normalize review feedback`; they never assume target-local skill scripts.
+
+Validation:
 
 ```bash
 python -m unittest discover -s tests
-```
-
-## Packaging
-
-```bash
-cd .. && python -m zipfile -c codex-longrun-kit.zip codex-longrun-kit
 ```

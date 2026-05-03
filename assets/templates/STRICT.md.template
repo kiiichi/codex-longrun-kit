@@ -1,17 +1,15 @@
 # STRICT.md
 
-Optional strict appendix. Read only when the user requests strict profile or the task is high risk.
+Optional strict appendix. Read for strict profile or high-risk tasks.
 
-## Extra stop guidance
-
-Stop and ask before:
+## HITL before
 
 - New dependency installation.
 - Database schema changes.
 - CI/CD changes.
-- Auth, permissions, billing, encryption, data retention, or migration changes not explicitly planned.
-- Any command that writes outside the workspace.
-- Any action that needs network access.
+- Auth, permissions, billing, encryption, data retention, or migration beyond plan.
+- Network access.
+- Writes outside workspace.
 
 ## Escalation format
 
@@ -25,7 +23,9 @@ Minimum human decision needed:
 
 ## Long-running process pattern
 
-Never run dev servers in the foreground during agent work.
+Foreground dev servers block agents.
+
+Use background process + log + PID + cleanup:
 
 ```bash
 mkdir -p .codex_artifacts/logs
@@ -40,5 +40,5 @@ kill "$(cat .codex_artifacts/logs/devserver.pid)" || true
 - Fast gate: every milestone.
 - Targeted gate: after behavior changes.
 - Full gate: before review freeze.
-- E2E / visual: before review freeze or when UI behavior changes.
-- Flaky / expensive checks: record but do not loop forever.
+- E2E / visual: before review freeze or UI behavior changes.
+- Flaky / expensive checks: record once; avoid repair loops without new evidence.

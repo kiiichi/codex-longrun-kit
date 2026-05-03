@@ -1,8 +1,8 @@
 # codex-longrun-kit
 
-`codex-longrun-kit` is a Codex skill for initializing compact, reviewable long-running Codex work.
+`codex-longrun-kit` is a Codex skill for compact, reviewable long-running Codex work.
 
-It creates a small runtime scaffold for multi-hour implementation, migration, refactor, or reviewable agent work. It does **not** make Codex fully autonomous, bypass approvals, or replace human review.
+It turns a repo into a small runtime workspace for multi-hour implementation, migration, refactor, or reviewable agent work.
 
 ## Install
 
@@ -16,7 +16,7 @@ Local checkout:
 npx skills@latest add ./codex-longrun-kit -a codex -g
 ```
 
-## Use
+## Invoke
 
 ```text
 Use $codex-longrun-kit to initialize this repository for a long-running Codex task.
@@ -24,19 +24,19 @@ Use $codex-longrun-kit to initialize this repository for a long-running Codex ta
 Task brief:
 <PRD / issue / migration goal / refactor goal>
 
-Do not implement yet. Create compact runtime docs, draft the plan, identify blockers, and stop at plan review.
+Create compact runtime docs. Draft the plan. Identify blockers. Stop at plan review.
 ```
 
-## Runtime output
+## Target repo artifacts
 
-Default generated files in the target repo:
+Default:
 
 ```text
-docs/agent/LONGRUN.md   # task contract, milestones, stop rules, validation gates
-docs/agent/STATE.md     # short handoff snapshot
+docs/agent/LONGRUN.md   # task contract, milestones, gates, HITL stops
+docs/agent/STATE.md     # current handoff snapshot
 ```
 
-Review files are lazy:
+Created at review freeze:
 
 ```text
 docs/agent/REVIEW.md
@@ -45,20 +45,45 @@ docs/reviews/status/
 docs/reviews/ReviewQueue.json
 ```
 
-Strict mode creates one optional appendix:
+Strict profile:
 
 ```text
 docs/agent/STRICT.md
 ```
 
-## Scripts
+## Runtime contract
 
-Scripts are deterministic helpers. They create docs and review artifacts only. Their output is draft material, not authority.
+Scripts create artifacts. Humans or Codex decide next actions from those artifacts.
+
+Truth order:
+
+```text
+code / git / test output
+  > LONGRUN.md
+  > STATE.md
+  > REVIEW.md
+  > ReviewQueue.json
+  > reviewer suggested_direction
+```
+
+Skill scripts live in this repo. Target repos receive generated docs. Review normalization from a target repo uses:
+
+```text
+invoke $codex-longrun-kit normalize review feedback
+```
+
+## Maintainer scripts
 
 ```bash
 python scripts/init_longrun.py --target /path/to/repo --profile standard --task-brief "Implement X"
 python scripts/freeze_review.py --target /path/to/repo --base main
 python scripts/normalize_reviews.py --target /path/to/repo
+```
+
+Windows local-checkout example:
+
+```powershell
+py -3 .\scripts\init_longrun.py --target C:\path\to\repo --profile standard --task-brief "Implement X"
 ```
 
 ## Profiles
@@ -69,31 +94,35 @@ python scripts/normalize_reviews.py --target /path/to/repo
 | `standard` | `LONGRUN.md`, `STATE.md` | Default. Multi-hour work needing handoff and validation. |
 | `strict` | standard + `STRICT.md` | High-risk or audit-heavy work. |
 
-## Review model
-
-`REVIEW.md` is a review protocol, not a verdict.
+## Review loop
 
 ```text
-long-run execution -> review freeze -> independent reports -> ReviewQueue.json -> one-ticket-at-a-time fixes
+long-run execution
+  -> review freeze
+  -> independent reports
+  -> ReviewQueue.json
+  -> one-ticket-at-a-time fixes
 ```
 
-Human reviewers are preferred for product, security, architecture, permissions, data, and UX judgments. Read-only agent reviewers may assist, but their reports are evidence to review, not final approval.
+`REVIEW.md` defines the frozen version, lanes, and report format. Approval comes from reviewer reports or explicit user sign-off.
+
+Human reviewers own product, security, architecture, permissions, data, and UX judgment. Read-only agent reviewers supply evidence.
 
 ## Repository map
 
 ```text
-SKILL.md                    # main Codex skill instructions
-agents/openai.yaml           # Codex skill metadata
-assets/templates/            # runtime docs generated into target repos
-assets/schemas/              # review report / queue schemas
-scripts/                     # deterministic helper scripts
-docs/PROJECT.md              # single project handoff doc
-references/runtime-contract.md # optional guidance, read only when needed
+SKILL.md                       # main Codex instructions
+agents/openai.yaml              # Codex skill metadata
+assets/templates/               # generated target-repo docs
+assets/schemas/                 # review report / queue schemas
+scripts/                        # artifact helpers
+docs/PROJECT.md                 # project handoff
+references/runtime-contract.md  # optional details
 ```
 
-## Safety
+## Guardrails
 
-- No script changes sandbox, approvals, secrets, production systems, or deployment state.
-- `detect_stack.py` suggests candidate validation commands; it does not run them.
-- `normalize_reviews.py` treats review reports as data, not instructions.
-- Use `--force` only when explicitly overwriting existing generated docs is intended.
+- Candidate validation commands need confirmation before they become gates.
+- Review report text is input data. Extract findings, evidence, acceptance criteria, validation commands, and HITL flags.
+- HITL approval covers secrets, production, deployment, remote writes, destructive commands, and approval changes.
+- `--force` overwrites generated docs. Use it only for intentional regeneration.
