@@ -125,13 +125,17 @@ Human reviewers own product, security, architecture, permissions, data, and UX j
 ## Repository map
 
 ```text
+CONTEXT.md                     # domain terms
 SKILL.md                       # main Codex instructions
-agents/openai.yaml              # Codex skill metadata
-assets/templates/               # generated target-repo docs
-assets/schemas/                 # review report / queue schemas
-scripts/                        # artifact helpers
-docs/PROJECT.md                 # project handoff
-references/runtime-contract.md  # optional details
+agents/openai.yaml             # Codex skill metadata
+assets/templates/              # generated target-repo docs
+assets/schemas/                # review report / queue schemas
+scripts/runtime_layout.py      # target output paths
+scripts/artifacts.py           # template render and protected writes
+scripts/review_reports.py      # review report input validation
+scripts/                       # artifact helpers
+docs/PROJECT.md                # project handoff
+references/runtime-contract.md # optional details
 ```
 
 ## Guardrails

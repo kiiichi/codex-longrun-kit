@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Initialize compact long-run runtime docs.
 
-Create artifacts only. Product code, dependencies, approvals, secrets, deployments, and remote state stay untouched.
+Create artifacts only. Product code, dependencies, approvals, secrets, deployments,
+and remote state stay untouched.
 """
 from __future__ import annotations
 
@@ -10,16 +11,13 @@ import datetime as dt
 from pathlib import Path
 
 try:
+    from artifacts import ArtifactWriter
     from detect_stack import detect
+    from runtime_layout import codex_artifacts_dir, longrun_dir, target_root
 except ImportError:  # pragma: no cover
+    from scripts.artifacts import ArtifactWriter  # type: ignore
     from scripts.detect_stack import detect  # type: ignore
-
-ROOT = Path(__file__).resolve().parents[1]
-TEMPLATES = ROOT / "assets" / "templates"
-
-
-def read_template(name: str) -> str:
-    return (TEMPLATES / name).read_text(encoding="utf-8")
+    from scripts.runtime_layout import codex_artifacts_dir, longrun_dir, target_root  # type: ignore
 
 
 def format_commands(commands: list[str] | None) -> str:
@@ -28,23 +26,10 @@ def format_commands(commands: list[str] | None) -> str:
     return "\n".join(f"- `{cmd}`" for cmd in commands)
 
 
-def render(text: str, mapping: dict[str, str]) -> str:
-    for key, value in mapping.items():
-        text = text.replace("{{" + key + "}}", value)
-    return text
-
-
-def write_file(path: Path, content: str, *, force: bool) -> bool:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists() and not force:
-        return False
-    path.write_text(content, encoding="utf-8")
-    return True
-
-
 def init(target: Path, profile: str, task_brief: str, force: bool = False) -> list[str]:
-    target = target.resolve()
+    target = target_root(target)
     target.mkdir(parents=True, exist_ok=True)
+    writer = ArtifactWriter(target, force=force)
     detected = detect(target)["commands"]
     now = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     mapping = {
@@ -57,28 +42,31 @@ def init(target: Path, profile: str, task_brief: str, force: bool = False) -> li
     }
 
     written: list[str] = []
-    docs_agent = target / "docs" / "agent" / "longrun"
+    docs_agent = longrun_dir(target)
     for name in ["LONGRUN.md", "STATE.md"]:
-        content = render(read_template(f"{name}.template"), mapping)
-        if write_file(docs_agent / name, content, force=force):
-            written.append(str((docs_agent / name).relative_to(target)))
+        path = docs_agent / name
+        if writer.write_template(path, f"{name}.template", mapping):
+            written.append(writer.relative(path))
 
-    artifacts = target / ".codex_artifacts"
+    artifacts = codex_artifacts_dir(target)
     artifacts.mkdir(parents=True, exist_ok=True)
-    if write_file(artifacts / ".gitignore", "*\n!.gitignore\n", force=force):
-        written.append(str((artifacts / ".gitignore").relative_to(target)))
+    gitignore = artifacts / ".gitignore"
+    if writer.write(gitignore, "*\n!.gitignore\n"):
+        written.append(writer.relative(gitignore))
 
     if profile == "strict":
-        content = render(read_template("STRICT.md.template"), mapping)
-        if write_file(docs_agent / "STRICT.md", content, force=force):
-            written.append(str((docs_agent / "STRICT.md").relative_to(target)))
+        path = docs_agent / "STRICT.md"
+        if writer.write_template(path, "STRICT.md.template", mapping):
+            written.append(writer.relative(path))
 
     return written
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", "--target-root", dest="target", default=".", help="Target repo root")
+    parser.add_argument(
+        "--target", "--target-root", dest="target", default=".", help="Target repo root"
+    )
     parser.add_argument("--profile", choices=["minimal", "standard", "strict"], default="standard")
     parser.add_argument("--task-brief", default="", help="Task brief to place in LONGRUN.md")
     parser.add_argument("--force", action="store_true", help="Overwrite existing generated files")
@@ -90,8 +78,14 @@ def main() -> int:
         for item in written:
             print(f"- {item}")
     else:
-        print("No files written. Existing files preserved. Use --force only with explicit user approval.")
-    print("Next: inspect docs/agent/longrun/LONGRUN.md and docs/agent/longrun/STATE.md, then stop for plan review.")
+        print(
+            "No files written. Existing files preserved. "
+            "Use --force only with explicit user approval."
+        )
+    print(
+        "Next: inspect docs/agent/longrun/LONGRUN.md and docs/agent/longrun/STATE.md, "
+        "then stop for plan review."
+    )
     print("Reminder: validation commands are candidates. Confirm gates during M1.")
     return 0
 

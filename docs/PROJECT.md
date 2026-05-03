@@ -2,7 +2,7 @@
 
 ## Version
 
-v0.3.3 longrun namespace and lifecycle.
+v0.3.4 architecture deepening.
 
 ## Goal
 
@@ -13,11 +13,15 @@ Outcome: target repos get enough structure for planning, long execution, recover
 ## Architecture
 
 ```text
-SKILL.md                  # compact agent-facing workflow
-assets/templates/         # generated runtime docs
-scripts/                  # artifact helpers
-references/               # optional detail, loaded on demand
-docs/PROJECT.md           # this handoff
+CONTEXT.md                 # domain glossary
+SKILL.md                   # compact agent-facing workflow
+assets/templates/          # generated runtime docs
+scripts/runtime_layout.py  # target output paths
+scripts/artifacts.py       # template render and protected writes
+scripts/review_reports.py  # review report input validation
+scripts/                   # artifact helpers
+references/                # optional detail, loaded on demand
+docs/PROJECT.md            # this handoff
 ```
 
 ## Target repo output
@@ -73,6 +77,7 @@ invoke $codex-longrun-kit normalize review feedback
 - v0.3.1: fix target-repo / script-location mismatch.
 - v0.3.2: rewrite language layer for dense operational instructions.
 - v0.3.3: namespace runtime docs under `docs/agent/longrun/`; add plan / longrun / closeout lifecycle.
+- v0.3.4: deepen runtime layout, artifact writing, and review report input modules.
 - v0.4: optional review-report schema validation.
 - v0.5: optional worktree patch-ticket workflow.
 
@@ -86,5 +91,6 @@ python -m unittest discover -s tests
 
 - Stack detection is heuristic.
 - Review normalization is heuristic.
+- Review report validation covers schema required fields and severity enum.
 - Freeze metadata records state; git remains mutable.
 - Plan review still gates long execution.
