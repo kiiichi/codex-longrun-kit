@@ -1,27 +1,14 @@
 # STATE.md
 
-Read when:
-- starting or resuming a Codex session
-- after context compaction
-- before editing code
-- before changing milestone
-
-Update when:
-- milestone status changes
-- validation result changes
-- key decision changes
-- stop rule triggers
-
-Do not:
-- write step-by-step logs
-- record guesses as facts
-- exceed 80 lines unless review freeze requires it
+Read when: starting/resuming a session, after compaction, before editing code.
+Update when: milestone, validation, decision, stop rule, or next action changes.
+Do not: write logs, record guesses as facts, or exceed 80 lines.
 
 ## Snapshot
 
 Current milestone: M1 — Scope and baseline
 Current status: initialized
-Next action: review `LONGRUN.md`, resolve `UNCONFIRMED` items, then decide whether to start implementation.
+Next action: review `LONGRUN.md`, resolve `UNCONFIRMED` items, then decide whether to implement.
 
 ## Done
 
@@ -59,4 +46,4 @@ Likely next files:
 ## Last reliable checkpoint
 
 Commit: UNCONFIRMED
-Review packet: not created
+Review freeze: not created

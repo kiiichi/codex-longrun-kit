@@ -5,17 +5,22 @@
     {
       "id": "SEC-001",
       "severity": "P1",
-      "claim": "Settings save endpoint appears to lack an authorization regression test.",
+      "claim": "Auth check missing on new endpoint",
       "evidence": {
-        "files": ["src/api/settings.ts", "tests/settings.test.ts"],
-        "observed": "No test covers unauthenticated save attempts."
+        "files": [
+          "src/api.ts:10"
+        ],
+        "observed": "Route is registered before auth middleware."
       },
-      "affected_files": ["tests/settings.test.ts"],
-      "acceptance_criteria": [
-        "Unauthenticated settings save returns 401.",
-        "Authenticated settings save still succeeds."
+      "affected_files": [
+        "src/api.ts"
       ],
-      "validation_commands": ["npm test -- settings"],
+      "acceptance_criteria": [
+        "Unauthenticated request returns 401."
+      ],
+      "validation_commands": [
+        "npm test -- auth"
+      ],
       "requires_human_decision": false
     }
   ]

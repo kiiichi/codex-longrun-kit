@@ -1,0 +1,44 @@
+# STRICT.md
+
+Optional strict appendix. Read only when the user requests strict profile or the task is high risk.
+
+## Extra stop guidance
+
+Stop and ask before:
+
+- New dependency installation.
+- Database schema changes.
+- CI/CD changes.
+- Auth, permissions, billing, encryption, data retention, or migration changes not explicitly planned.
+- Any command that writes outside the workspace.
+- Any action that needs network access.
+
+## Escalation format
+
+```text
+Triggered rule:
+Evidence:
+Options:
+Recommendation:
+Minimum human decision needed:
+```
+
+## Long-running process pattern
+
+Never run dev servers in the foreground during agent work.
+
+```bash
+mkdir -p .codex_artifacts/logs
+nohup <dev-server-command> > .codex_artifacts/logs/devserver.log 2>&1 &
+echo $! > .codex_artifacts/logs/devserver.pid
+# run checks
+kill "$(cat .codex_artifacts/logs/devserver.pid)" || true
+```
+
+## Validation cost policy
+
+- Fast gate: every milestone.
+- Targeted gate: after behavior changes.
+- Full gate: before review freeze.
+- E2E / visual: before review freeze or when UI behavior changes.
+- Flaky / expensive checks: record but do not loop forever.

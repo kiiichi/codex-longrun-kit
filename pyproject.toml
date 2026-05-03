@@ -1,6 +1,6 @@
 [project]
 name = "codex-longrun-kit"
-version = "0.2.0"
+version = "0.3.0"
 description = "Codex skill for compact, reviewable long-running Codex task initialization."
 requires-python = ">=3.10"
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Detect likely validation commands for compact Codex long-run docs.
+"""Suggest candidate validation commands for compact Codex long-run docs.
 
-The detector is intentionally conservative. It suggests commands from visible
-project files; it does not install dependencies or execute project commands.
+This script is read-only. It inspects visible project files and prints likely
+commands. It does not install dependencies, run project commands, or modify
+source files. Treat output as candidates until confirmed.
 """
 from __future__ import annotations
 
@@ -55,21 +56,18 @@ def python_commands(root: Path) -> dict[str, list[str]]:
     markers = ["pyproject.toml", "requirements.txt", "setup.py", "setup.cfg", "tox.ini", "pytest.ini"]
     if not any((root / m).exists() for m in markers):
         return {}
-
-    cmds: dict[str, list[str]] = {
-        "fast": [],
+    text = "\n".join((root / m).read_text(encoding="utf-8", errors="ignore") for m in markers if (root / m).exists())
+    fast: list[str] = []
+    if "ruff" in text:
+        fast.append("python -m ruff check .")
+    if "mypy" in text:
+        fast.append("python -m mypy .")
+    return {
+        "fast": fast,
         "targeted": ["python -m pytest -q"],
         "full": ["python -m pytest"],
-        "freeze": ["python -m pytest"],
+        "freeze": fast + ["python -m pytest"],
     }
-    text = "\n".join((root / m).read_text(encoding="utf-8", errors="ignore") for m in markers if (root / m).exists())
-    if "ruff" in text:
-        cmds["fast"].append("python -m ruff check .")
-        cmds["freeze"].insert(0, "python -m ruff check .")
-    if "mypy" in text:
-        cmds["fast"].append("python -m mypy .")
-        cmds["freeze"].insert(0, "python -m mypy .")
-    return cmds
 
 
 def rust_commands(root: Path) -> dict[str, list[str]]:
@@ -87,66 +85,52 @@ def go_commands(root: Path) -> dict[str, list[str]]:
     if not (root / "go.mod").exists():
         return {}
     return {
-        "fast": ["gofmt -w . # inspect diff before committing", "go vet ./..."],
+        "fast": ["gofmt -l .", "go vet ./..."],
         "targeted": ["go test ./..."],
         "full": ["go test ./..."],
-        "freeze": ["go vet ./...", "go test ./..."],
+        "freeze": ["gofmt -l .", "go vet ./...", "go test ./..."],
     }
 
 
-def makefile_commands(root: Path) -> dict[str, list[str]]:
-    mf = root / "Makefile"
-    if not mf.exists():
+def make_commands(root: Path) -> dict[str, list[str]]:
+    makefile = root / "Makefile"
+    if not makefile.exists():
         return {}
-    text = mf.read_text(encoding="utf-8", errors="ignore")
-    targets = set()
-    for line in text.splitlines():
-        if line and not line.startswith((" ", "\t", "#")) and ":" in line:
-            name = line.split(":", 1)[0].strip()
-            if name and all(c.isalnum() or c in "_-" for c in name):
-                targets.add(name)
-    out = {"fast": [], "targeted": [], "full": [], "freeze": []}
-    for target in ["lint", "typecheck", "check"]:
-        if target in targets:
-            out["fast"].append(f"make {target}")
-    for target in ["test", "unit"]:
-        if target in targets:
-            out["targeted"].append(f"make {target}")
-            out["full"].append(f"make {target}")
-    for target in ["build", "e2e"]:
-        if target in targets:
-            out["full"].append(f"make {target}")
-    out["freeze"] = list(dict.fromkeys(out["fast"] + out["full"]))
-    return {k: v for k, v in out.items() if v}
+    text = makefile.read_text(encoding="utf-8", errors="ignore")
+    cmds: dict[str, list[str]] = {"fast": [], "targeted": [], "full": [], "freeze": []}
+    for target, bucket in [("lint", "fast"), ("typecheck", "fast"), ("test", "targeted"), ("build", "full")]:
+        if f"{target}:" in text:
+            cmds[bucket].append(f"make {target}")
+            if bucket != "freeze":
+                cmds["freeze"].append(f"make {target}")
+    return cmds
 
 
-def merge_commands(*groups: dict[str, list[str]]) -> dict[str, list[str]]:
-    merged: dict[str, list[str]] = {"fast": [], "targeted": [], "full": [], "freeze": [], "dev": []}
-    for group in groups:
-        for key, values in group.items():
-            for value in values:
-                if value not in merged.setdefault(key, []):
-                    merged[key].append(value)
-    return {k: v for k, v in merged.items() if v}
+def merge(target: dict[str, list[str]], source: dict[str, list[str]]) -> None:
+    for key, values in source.items():
+        target.setdefault(key, [])
+        for value in values:
+            if value not in target[key]:
+                target[key].append(value)
 
 
 def detect(root: Path) -> dict[str, Any]:
     root = root.resolve()
-    commands = merge_commands(
-        js_commands(root),
-        python_commands(root),
-        rust_commands(root),
-        go_commands(root),
-        makefile_commands(root),
-    )
-    if not commands:
+    commands: dict[str, list[str]] = {"fast": [], "targeted": [], "full": [], "freeze": []}
+    for detector in [js_commands, python_commands, rust_commands, go_commands, make_commands]:
+        merge(commands, detector(root))
+    if not any(commands.values()):
         commands = {
             "fast": ["UNCONFIRMED: add lint/typecheck command"],
             "targeted": ["UNCONFIRMED: add targeted test command"],
             "full": ["UNCONFIRMED: add full test/build command"],
             "freeze": ["UNCONFIRMED: add review-freeze validation command"],
         }
-    return {"root": str(root), "commands": commands}
+    return {
+        "root": str(root),
+        "notes": ["Detected commands are candidates. Confirm before using them as validation gates."],
+        "commands": commands,
+    }
 
 
 def main() -> int:

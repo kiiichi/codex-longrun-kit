@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Initialize compact long-running Codex runtime docs in a target repo."""
+"""Initialize compact long-running Codex runtime docs in a target repo.
+
+Writes generated docs only. Does not modify product code, run validation,
+install dependencies, change approvals, or contact remote services.
+"""
 from __future__ import annotations
 
 import argparse
 import datetime as dt
-import sys
 from pathlib import Path
 
 try:
@@ -67,10 +70,9 @@ def init(target: Path, profile: str, task_brief: str, force: bool = False) -> li
         written.append(str((artifacts / ".gitignore").relative_to(target)))
 
     if profile == "strict":
-        for name in ["STOP_RULES.md", "VALIDATION_MATRIX.md"]:
-            content = render(read_template(f"{name}.template"), mapping)
-            if write_file(docs_agent / name, content, force=force):
-                written.append(str((docs_agent / name).relative_to(target)))
+        content = render(read_template("STRICT.md.template"), mapping)
+        if write_file(docs_agent / "STRICT.md", content, force=force):
+            written.append(str((docs_agent / "STRICT.md").relative_to(target)))
 
     return written
 
@@ -89,8 +91,9 @@ def main() -> int:
         for item in written:
             print(f"- {item}")
     else:
-        print("No files written. Existing files preserved. Use --force to overwrite.")
+        print("No files written. Existing files preserved. Use --force only with explicit user approval.")
     print("Next: inspect docs/agent/LONGRUN.md and docs/agent/STATE.md, then stop for plan review.")
+    print("Reminder: generated validation commands are candidates, not proof.")
     return 0
 
 

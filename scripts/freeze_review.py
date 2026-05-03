@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Create lazy review artifacts for a frozen long-running Codex result."""
+"""Create lazy review artifacts for a frozen long-running Codex result.
+
+Writes review protocol files only. It does not freeze git itself, prevent future
+edits, review the code, or make product decisions.
+"""
 from __future__ import annotations
 
 import argparse
@@ -24,6 +28,19 @@ def render(text: str, mapping: dict[str, str]) -> str:
     return text
 
 
+def working_tree_status(target: Path) -> str:
+    status = run_git(target, ["status", "--short"])
+    if status == "UNCONFIRMED":
+        return "- UNCONFIRMED: git status unavailable."
+    if not status:
+        return "- Clean working tree reported by git."
+    lines = ["- WARNING: working tree has uncommitted changes. Review freeze is not stable until committed or explicitly recorded."]
+    lines.extend(f"- `{line}`" for line in status.splitlines()[:30])
+    if len(status.splitlines()) > 30:
+        lines.append("- Additional changes omitted from this summary.")
+    return "\n".join(lines)
+
+
 def freeze(target: Path, base: str, force: bool = False) -> list[str]:
     target = target.resolve()
     now = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
@@ -41,6 +58,7 @@ def freeze(target: Path, base: str, force: bool = False) -> list[str]:
         "CURRENT_BRANCH": current_branch,
         "CREATED_AT": now,
         "DIFF_STAT": diff_stat,
+        "WORKTREE_STATUS": working_tree_status(target),
     }
 
     written: list[str] = []
@@ -78,8 +96,9 @@ def main() -> int:
         for item in written:
             print(f"- {item}")
     else:
-        print("No files written. Existing review files preserved. Use --force to overwrite.")
-    print("Next: reviewers write independent JSON reports under docs/reviews/pending/.")
+        print("No files written. Existing review files preserved. Use --force only with explicit user approval.")
+    print("Next: stop product-code changes; reviewers write independent JSON reports under docs/reviews/pending/.")
+    print("Reminder: REVIEW.md is a protocol, not a review verdict.")
     return 0
 
 

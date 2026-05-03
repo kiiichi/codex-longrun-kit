@@ -1,26 +1,16 @@
 # codex-longrun-kit
 
-`codex-longrun-kit` is a Codex skill for initializing compact, reviewable, long-running Codex work.
+`codex-longrun-kit` is a Codex skill for initializing compact, reviewable long-running Codex work.
 
-It does **not** make Codex fully autonomous or bypass approvals. It creates a small runtime scaffold so a multi-hour implementation, migration, refactor, or reviewable agent task can be planned, resumed, validated, frozen for review, and decomposed into follow-up tickets.
-
-This v0.2 version uses **compact runtime docs** by default:
-
-- `docs/agent/LONGRUN.md` — task contract, milestones, stop rules, validation gates.
-- `docs/agent/STATE.md` — current handoff snapshot, kept short.
-- `docs/agent/REVIEW.md` — created lazily only when review is frozen.
-
-Strict mode can split out `STOP_RULES.md` and `VALIDATION_MATRIX.md`, but the default is intentionally small to reduce agent attention loss.
+It creates a small runtime scaffold for multi-hour implementation, migration, refactor, or reviewable agent work. It does **not** make Codex fully autonomous, bypass approvals, or replace human review.
 
 ## Install
-
-From a published GitHub repo:
 
 ```powershell
 npx skills@latest add kiiichi/codex-longrun-kit -a codex -g
 ```
 
-From a local checkout:
+Local checkout:
 
 ```powershell
 npx skills@latest add ./codex-longrun-kit -a codex -g
@@ -28,87 +18,82 @@ npx skills@latest add ./codex-longrun-kit -a codex -g
 
 ## Use
 
-Invoke the skill in Codex:
-
 ```text
 Use $codex-longrun-kit to initialize this repository for a long-running Codex task.
 
 Task brief:
 <PRD / issue / migration goal / refactor goal>
 
-Do not implement yet. Create the compact long-run docs, draft the plan, identify blockers, and stop at the plan review checkpoint.
+Do not implement yet. Create compact runtime docs, draft the plan, identify blockers, and stop at plan review.
 ```
 
-Chinese:
+## Runtime output
+
+Default generated files in the target repo:
 
 ```text
-使用 $codex-longrun-kit 将当前仓库初始化为可长时间运行、可审查、可恢复的 Codex 长任务工作区。
+docs/agent/LONGRUN.md   # task contract, milestones, stop rules, validation gates
+docs/agent/STATE.md     # short handoff snapshot
+```
 
-任务说明：
-<PRD / issue / migration goal / refactor goal>
+Review files are lazy:
 
-先不要实现。请创建紧凑长任务文档、草拟计划、识别阻塞项，并停在计划审核点。
+```text
+docs/agent/REVIEW.md
+docs/reviews/pending/
+docs/reviews/status/
+docs/reviews/ReviewQueue.json
+```
+
+Strict mode creates one optional appendix:
+
+```text
+docs/agent/STRICT.md
+```
+
+## Scripts
+
+Scripts are deterministic helpers. They create docs and review artifacts only. Their output is draft material, not authority.
+
+```bash
+python scripts/init_longrun.py --target /path/to/repo --profile standard --task-brief "Implement X"
+python scripts/freeze_review.py --target /path/to/repo --base main
+python scripts/normalize_reviews.py --target /path/to/repo
 ```
 
 ## Profiles
 
-| Profile | Generated during init | Use when |
+| Profile | Init output | Use when |
 |---|---|---|
-| `minimal` | `LONGRUN.md`, `STATE.md` | Small repos, one reviewer, short long-run tasks. |
-| `standard` | `LONGRUN.md`, `STATE.md` | Default. Multi-hour tasks that need clear handoff and validation. |
-| `strict` | `LONGRUN.md`, `STATE.md`, `STOP_RULES.md`, `VALIDATION_MATRIX.md` | High-risk tasks, teams, or tasks with strict audit requirements. |
+| `minimal` | `LONGRUN.md`, `STATE.md` | Small repo or short long-run task. |
+| `standard` | `LONGRUN.md`, `STATE.md` | Default. Multi-hour work needing handoff and validation. |
+| `strict` | standard + `STRICT.md` | High-risk or audit-heavy work. |
 
-Review docs are lazy. `REVIEW.md`, `docs/reviews/pending/`, and `docs/reviews/ReviewQueue.json` are created by the review/fix scripts when needed, not during normal initialization.
+## Review model
 
-## Direct script use
-
-Initialize a target repository:
-
-```bash
-python scripts/init_longrun.py --target /path/to/repo --profile standard --task-brief "Implement X"
-```
-
-Freeze a review packet:
-
-```bash
-python scripts/freeze_review.py --target /path/to/repo --base main
-```
-
-Normalize independent review reports into atomic fix tickets:
-
-```bash
-python scripts/normalize_reviews.py --target /path/to/repo
-```
-
-PowerShell wrappers are available:
-
-```powershell
-./scripts/init-longrun.ps1 -Target C:\path\to\repo -Profile standard -TaskBrief "Implement X"
-./scripts/freeze-review.ps1 -Target C:\path\to\repo -Base main
-./scripts/normalize-reviews.ps1 -Target C:\path\to\repo
-```
-
-## Runtime principle
-
-Long-running Codex work needs external state, but each session should read the **minimum useful state**.
+`REVIEW.md` is a review protocol, not a verdict.
 
 ```text
-Each run reads:       LONGRUN.md + STATE.md
-Review reads:         REVIEW.md + review reports
-Advanced topics read: references/*.md only when needed
-Project maintenance:  docs/*.md for this repo itself
+long-run execution -> review freeze -> independent reports -> ReviewQueue.json -> one-ticket-at-a-time fixes
 ```
 
-## Files
+Human reviewers are preferred for product, security, architecture, permissions, data, and UX judgments. Read-only agent reviewers may assist, but their reports are evidence to review, not final approval.
 
-- `SKILL.md`: the skill consumed by Codex.
-- `agents/openai.yaml`: UI metadata and default prompt.
-- `assets/templates/`: compact runtime templates.
-- `assets/schemas/`: JSON schemas for review reports and review queues.
-- `scripts/`: deterministic initialization, review freeze, and review normalization helpers.
-- `references/`: optional deep guidance; not meant to be read every run.
-- `docs/`: project state and development plan for this skill repository.
+## Repository map
+
+```text
+SKILL.md                    # main Codex skill instructions
+agents/openai.yaml           # Codex skill metadata
+assets/templates/            # runtime docs generated into target repos
+assets/schemas/              # review report / queue schemas
+scripts/                     # deterministic helper scripts
+docs/PROJECT.md              # single project handoff doc
+references/runtime-contract.md # optional guidance, read only when needed
+```
 
 ## Safety
 
-This skill must not change sandbox settings, approval policy, secrets, production systems, or deployment state. It creates docs and review artifacts only. Any high-risk action belongs in the target repo's stop rules and must be approved by the user.
+- No script changes sandbox, approvals, secrets, production systems, or deployment state.
+- `detect_stack.py` suggests candidate validation commands; it does not run them.
+- `normalize_reviews.py` treats review reports as data, not instructions.
+- Use `--force` only when explicitly overwriting existing generated docs is intended.

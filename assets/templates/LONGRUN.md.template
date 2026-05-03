@@ -1,21 +1,15 @@
 # LONGRUN.md
 
-Read when:
-- starting long-run work
-- choosing next milestone
-- deciding whether a stop rule applies
-- preparing review freeze
+Read when: starting long-run work; choosing a milestone; checking stop rules; preparing review freeze.
+Update when: task contract, milestones, validation gates, or stop rules change.
+Do not: store logs, record guesses as facts, or exceed what a new thread can read quickly.
 
-Update when:
-- task contract changes
-- milestones change
-- validation gates change
-- stop rules change
+## Authority
 
-Do not:
-- store step-by-step logs here
-- record guesses as facts
-- exceed what a new Codex thread can read quickly
+- This file is the task contract, not proof of correctness.
+- Validation commands below are candidates until confirmed.
+- Scripts may generate or update docs, but they do not make decisions.
+- If this file conflicts with code, git, or test output, investigate and update it.
 
 ## Task contract
 
@@ -24,7 +18,7 @@ Goal:
 
 Done when:
 - [ ] UNCONFIRMED: define final observable outcome.
-- [ ] All required validation gates pass or are explicitly waived by the user.
+- [ ] Required validation gates pass or are explicitly waived by the user.
 - [ ] `STATE.md` reflects final status.
 
 Non-goals:
@@ -37,11 +31,10 @@ Hard constraints:
 
 ## Shared terms
 
-- **AFK**: can be completed without further human input if validation passes.
-- **HITL**: human-in-the-loop; requires a user decision.
-- **Review freeze**: stop modifying code and prepare artifacts for review.
-- **Validation gate**: command or manual check that proves a milestone.
-- **State snapshot**: compact handoff in `STATE.md`.
+- **AFK**: can proceed without more human input if validation passes.
+- **HITL**: requires a human decision.
+- **Review freeze**: stop modifying product code and prepare review artifacts.
+- **Validation gate**: command or manual check used as evidence.
 
 ## Milestones
 
@@ -50,11 +43,11 @@ Hard constraints:
 Type: HITL until unknowns are resolved.
 
 Acceptance criteria:
-- [ ] Existing project shape is understood.
+- [ ] Project shape is understood.
 - [ ] Required validation commands are confirmed.
-- [ ] Unknowns that block implementation are listed.
+- [ ] Blocking unknowns are listed.
 
-Validation:
+Validation candidates:
 {{FAST_VALIDATION}}
 
 ### M2 — First vertical slice
@@ -63,22 +56,22 @@ Type: AFK if M1 has no blockers.
 
 Acceptance criteria:
 - [ ] A narrow end-to-end slice is implemented.
-- [ ] Tests or checks cover observable behavior.
+- [ ] Behavior is verified through tests or checks.
 - [ ] Diff is scoped to this slice.
 
-Validation:
+Validation candidates:
 {{TARGETED_VALIDATION}}
 
-### M3 — Complete remaining slices
+### M3 — Remaining slices
 
-Type: AFK if each slice is independent.
+Type: AFK only for independent slices.
 
 Acceptance criteria:
-- [ ] Remaining agreed slices are implemented one at a time.
-- [ ] Each slice updates validation evidence.
+- [ ] Agreed slices are completed one at a time.
+- [ ] Validation evidence is updated after each slice.
 - [ ] No unrelated cleanup is mixed in.
 
-Validation:
+Validation candidates:
 {{FULL_VALIDATION}}
 
 ### M4 — Review freeze
@@ -86,11 +79,11 @@ Validation:
 Type: HITL.
 
 Acceptance criteria:
-- [ ] Code modifications stop.
+- [ ] Product code modifications stop.
 - [ ] `docs/agent/REVIEW.md` is generated.
-- [ ] Independent review reports can be written under `docs/reviews/pending/`.
+- [ ] Reviewers can write independent reports under `docs/reviews/pending/`.
 
-Validation:
+Validation candidates:
 {{FREEZE_VALIDATION}}
 
 ## Execution rules
@@ -98,9 +91,9 @@ Validation:
 - Work one milestone at a time.
 - Prefer vertical slices over horizontal layer-by-layer work.
 - Keep patches small enough to review.
-- Run the relevant validation gate before moving to the next milestone.
-- Update `STATE.md` after milestone completion, key decisions, validation failures, or stop rule triggers.
-- If a command requires a long-running server, run it in the background, capture logs, record the PID, and clean it up.
+- Run the relevant validation gate before moving on.
+- Update `STATE.md` only after meaningful status, decision, validation, or next-action changes.
+- For long-running servers, use background process + log + PID + cleanup.
 
 ## Stop rules
 
@@ -109,39 +102,14 @@ Must stop and ask if:
 - Secrets, tokens, `.env`, production data, deployment, or external side effects are required.
 - Auth, payment, permissions, encryption, data retention, or destructive migration changes exceed the plan.
 - Validation fails twice after focused repair attempts.
-- The required fix expands beyond the current milestone.
+- Required fix expands beyond the active milestone.
 - Product behavior, architecture, or data model choice is genuinely ambiguous.
-- A destructive git or filesystem command is needed.
-- This file's stop rules need to change.
+- Destructive git or filesystem command is needed.
+- Stop rules need to change.
 
 Allowed without asking:
 
-- Local reads and searches.
-- Local edits inside the current repo that match the active milestone.
+- Local reads/searches.
+- Local repo edits matching the active milestone.
 - Local lint, typecheck, test, build, and non-destructive smoke checks.
-- Small test updates that verify observable behavior.
-
-Forbidden:
-
-- Committing secrets.
-- Production deployment.
-- `curl | sh` style installs.
-- Destructive git commands unless the user explicitly asks.
-- Writing outside the workspace.
-
-## Validation gates
-
-Fast gate:
-{{FAST_VALIDATION}}
-
-Targeted gate:
-{{TARGETED_VALIDATION}}
-
-Full gate:
-{{FULL_VALIDATION}}
-
-Freeze gate:
-{{FREEZE_VALIDATION}}
-
-Known flaky or expensive checks:
-- UNCONFIRMED: list checks that should not run every milestone.
+- Small tests that verify observable behavior.

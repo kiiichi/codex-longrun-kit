@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Codex Longrun Review Report",
+  "title": "Longrun review report",
   "type": "object",
   "required": [
     "reviewer_lane",
@@ -27,7 +27,6 @@
             "type": "string"
           },
           "severity": {
-            "type": "string",
             "enum": [
               "P0",
               "P1",
@@ -63,10 +62,8 @@
           "requires_human_decision": {
             "type": "boolean"
           }
-        },
-        "additionalProperties": true
+        }
       }
     }
-  },
-  "additionalProperties": true
+  }
 }
